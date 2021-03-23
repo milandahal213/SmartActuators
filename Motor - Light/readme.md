@@ -1,7 +1,6 @@
 # SmartActuators
 
-<iframe width="1280" height="720" src="https://www.youtube.com/watch?v=g_jaH1FCP5I
-" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[![Alt text](https://img.youtube.com/vi/g_jaH1FCP5I/0.jpg)](https://www.youtube.com/watch?v=g_jaH1FCP5I)
 
 
 ## Hardware required: <br><br>
