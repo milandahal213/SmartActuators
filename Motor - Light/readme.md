@@ -1,5 +1,9 @@
 # SmartActuators
 
+<iframe width="1280" height="720" src="https://www.youtube.com/watch?v=g_jaH1FCP5I
+" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+
 ## Hardware required: <br><br>
 1. Seeduino Xiao (https://www.seeedstudio.com/Seeeduino-XIAO-Arduino-Microcontroller-SAMD21-Cortex-M0+-p-4426.html?gclid=Cj0KCQjwo-aCBhC-ARIsAAkNQivw-3OmuSQJH-566glca2OQdqHqBvfcHzRVrzHG_Yquccrh7D62IB8aAj9nEALw_wcB) 
 2. Grove Shield	(https://www.seeedstudio.com/Grove-Shield-for-Seeeduino-XIAO-p-4621.html?gclid=Cj0KCQjwo-aCBhC-ARIsAAkNQivtoBqLyFaTQZwPKE6G-gMXh7EEQH9OkHMKbz3C7OIZ6SGZI7mKTqAaArxgEALw_wcB	)					
