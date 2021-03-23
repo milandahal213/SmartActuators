@@ -15,3 +15,13 @@ Motor - "1 2 3v3 GND" port  <br>
 Sliding Potentiometer - "7 6 3v3 GND" port<br>
 Button - "9 10 3v3 GND"<br>
 Light Sensor - "5 4 3v3 GND" port <br>
+
+## Running the code: <br><br>
+Copy the entire folder and place it in the Seeeduino Xiao. main.py file should run on startup.
+
+## Using the system:<br><br>
+The program starts on Training Mode. Set the motor speed with potentiometer. Shine light or block the light (however you want to train the speed) on the Light Sensor and press the button to record the data. Repeat if you want. Set different speeds for different light intensites. 
+<br>
+To switch to the Running Mode long press (more than 2 seconds) the button. The motor should run with speed corresponding to the light intensity on light sensor. 
+<br><br>
+To go back to the Training Mode, press the button once. 
