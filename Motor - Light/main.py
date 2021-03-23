@@ -9,13 +9,11 @@ from digitalio import DigitalInOut, Direction
 pwm = pwmio.PWMOut(board.A2, frequency=50)
 my_servo = servo.ContinuousServo(pwm)
 
+light=AnalogIn(board.A5)
+
 slider = AnalogIn(board.A7)
-print(slider.value)
 
 switch = DigitalInOut(board.D9)
-
-light=AnalogIn(board.A5)
-print(light.value)
 
 def check_button():
 	print("button pressed")
@@ -25,7 +23,7 @@ def check_button():
 	now=time.monotonic()
 	print(enter,now)
 	return (now-enter)
-x=light.value
+
 x=0  # x
 y=0   # y
 
@@ -44,8 +42,8 @@ while True:
 	y = slider.value/65520
 	my_servo.throttle=y
 	if (switch.value):
-		press_time=check_button()					#Training mode
-		if(press_time<2):
+		press_time=check_button()					
+		if(press_time<2): #Training mode
 			x=light.value/100
 			sx=sx+x
 			sy=sy+y
