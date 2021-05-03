@@ -119,7 +119,7 @@ void loop() {
       if(LIS.getAccelerationZ()>0 and flipState==0){  // make sure the board is upright
         flipState=1;
       }
-      else if(LIS.getAccelerationZ()<0 and flipState==1){  // and followed by flipped
+      else if(LIS.getAccelerationZ()<-0.5 and flipState==1){  // and followed by flipped
         flipState=2;
       }
       else if(LIS.getAccelerationZ()>0 and flipState==2){
@@ -138,8 +138,10 @@ void loop() {
         buzz(2,300);
         break;                  // to leave as soon as the board is flipped
       }
+      
       delay(10);
     }
+    flipState=0;
     while(digitalRead(button)){  // to hold while the button is still pressed
       delay(50);
     }
