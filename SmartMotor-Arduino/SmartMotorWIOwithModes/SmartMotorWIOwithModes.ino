@@ -1,3 +1,6 @@
+
+
+
 #include <Arduino.h>
 #include <U8g2lib.h>
  
@@ -15,12 +18,12 @@ U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* clock=*/ SCL, /* data=*/ SD
 
 #include<Servo.h>
 
-int servoPin =7; 
-int LEDPin =3; 
+int servoPin =10; 
+int LEDPin =2; 
 int sensorPin = A0;
-int buzzerPin= 5;
-int lightPin = A6;
-const int button = 6;
+int buzzerPin= 8;
+int lightPin = A7;
+const int button = 1;
 
 Servo Servo1; 
 float Rspeed = 0; 
