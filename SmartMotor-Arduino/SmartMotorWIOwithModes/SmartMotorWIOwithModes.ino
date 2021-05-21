@@ -179,9 +179,10 @@ void loop() {
           disp();
         }
         delay(100);
-      }
+      
       count=0;
       Tstatus="Training";                       // We use this in Mode 2 to show what state we are in 
     delay(50);
   }
 }
+  }
