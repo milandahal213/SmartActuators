@@ -1,6 +1,3 @@
-
-
-
 #include <Arduino.h>
 #include <U8g2lib.h>
  
@@ -18,12 +15,12 @@ U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* clock=*/ SCL, /* data=*/ SD
 
 #include<Servo.h>
 
-int servoPin =10; 
-int LEDPin =2; 
+int servoPin =7; 
+int LEDPin =3; 
 int sensorPin = A0;
-int buzzerPin= 8;
-int lightPin = A7;
-const int button = 1;
+int buzzerPin= 5;
+int lightPin = A6;
+const int button = 6;
 
 Servo Servo1; 
 float Rspeed = 0; 
@@ -74,7 +71,7 @@ void disp(){
   itoa(count, C_count,10);
   u8g2.clearBuffer();                   // clear the internal memory
   u8g2.setFont(u8g2_font_ncenB08_tr);   // choose a suitable font
-  u8g2.drawStr(5,10,Tstatus);           //print the status
+  u8g2.drawStr(5,10,Tstatus);    //print the status
   u8g2.drawStr(60,10,"Count: ");
   u8g2.drawStr(98,10,C_count); 
   u8g2.drawStr(110,10,"/10"); 
@@ -104,10 +101,10 @@ void setup() {
 }
 
 void loop() {
-  if(Mode=="Mode2"){ // only when Mode 2 is activated
-    fade_value=fade(Rspeed); // the LED fade value dependent on the potentiometer
+  if(Mode=="Mode2"){
+    fade_value=fade(Rspeed);
     analogWrite(LEDPin,fade_value);
-    disp(); // display is ON 
+    disp();
   }
   Rspeed = analogRead(sensorPin); //rotary encoder value
   turn_angle=conv(Rspeed);        //calculating angle for servo
@@ -122,21 +119,21 @@ void loop() {
       else if(LIS.getAccelerationZ()<-0.5 and flipState==1){  // and followed by flipped
         flipState=2;
       }
-      else if(LIS.getAccelerationZ()>0 and flipState==2){ // and back up again
-        if (Mode=="Mode1"){ // if Mode is in mode 1 
-          Mode="Mode2"; // if flipped back and up while holding the button go to mode 2
+      else if(LIS.getAccelerationZ()>0 and flipState==2){
+        if (Mode=="Mode1"){
+          Mode="Mode2";
           
         }
-        else{     // if mode is in mode 2 ... now we can add all sorts of modes here... what will the mode 3 be?? 
-          Mode="Mode1"; // go back to Mode1
-          u8g2.clearBuffer();  // clean the screen
+        else{
+          Mode="Mode1";
+          u8g2.clearBuffer();  
           u8g2.sendBuffer(); 
-          analogWrite(LEDPin,0);  //turn off the LED
+          analogWrite(LEDPin,0);
           }
-        flipState=0;    //reset the flipState 
-        count=-1;       //start recounting
-        buzz(2,300);    //beep twice
-        break;          // to leave as soon as the board is flipped
+        flipState=0;
+        count=-1;
+        buzz(2,300);
+        break;                  // to leave as soon as the board is flipped
       }
       
       delay(10);
@@ -148,9 +145,6 @@ void loop() {
     if(count<0){ // condition for when they come out of different modes
       count=0;  
     }
-
-
-    //This is where all the data is getting stored
     else if(count>=0 && count<10){                   //if training data is less than 10
       training[count][0]=turn_angle;      //save angle to array
       training[count][1]=brightness;      //save brightness to array
@@ -166,23 +160,23 @@ void loop() {
         mini=1000;
         turn_angle=0;
         for (int i=0;i<10;i++){
-          dist=abs(brightness - training[i][1]); //find the closest match to the light sensor value from the training data set
+          dist=abs(brightness - training[i][1]);
           if (dist<mini){
             mini=dist;
-            turn_angle=training[i][0];          // and set the angle to turn to the corresponding angle
-            fade_value=training[i][2];          // set the LED fade value to the corresponding fade value
+            turn_angle=training[i][0];
+            fade_value=training[i][2];
           }
         }
-        Servo1.write(turn_angle);               // turn the motor to the new angle
-        if(Mode=="Mode2"){                      //if in Mode 2
-          analogWrite(LEDPin,fade_value);       //also set the LED brightness
+        Servo1.write(turn_angle);
+        if(Mode=="Mode2"){
+          analogWrite(LEDPin,fade_value); 
           disp();
         }
         delay(100);
-      
+      }
       count=0;
-      Tstatus="Training";                       // We use this in Mode 2 to show what state we are in 
+      Tstatus="Training";
+    }
     delay(50);
   }
 }
-  }
