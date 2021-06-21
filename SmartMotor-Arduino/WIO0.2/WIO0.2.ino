@@ -16,6 +16,8 @@ int y=30;
 int old_y=30;
 int selectd=0;
 
+
+//training variables
 int training[10][2];
 int inc=1;
 int count=0;
@@ -75,6 +77,38 @@ void loop() {
 
 }
 
+
+
+int menu(){
+  while(digitalRead(WIO_5S_PRESS)){
+    if (digitalRead(WIO_5S_UP) == LOW){
+      selection=0;
+      drawGraphics(0);
+      }
+    else if(digitalRead(WIO_5S_DOWN) == LOW){
+      selection=1;
+      drawGraphics(1);
+      }
+
+
+    }
+   return selection;  
+}
+
+
+
+void drawGraphics(int s){
+  tft.drawRect(x,y,280,40,green);
+  x=20;
+  y=10 + 40*s;
+  tft.drawRect(x,y,280,40,31);
+  for(int i=0;i<2;i++){
+  tft.setCursor((320 - tft.textWidth(menuNames[i]))/2, 20+i*40);
+  tft.print(menuNames[i]);
+   }
+}
+
+
 void info(){
   tft.fillScreen(green);
   while(digitalRead(WIO_KEY_A)){
@@ -91,36 +125,8 @@ void buzz(int t){
   }
 }
 
-int menu(){
-  while(digitalRead(WIO_5S_PRESS)){
-    if (digitalRead(WIO_5S_UP) == LOW){
-      selection=0;
-      drawGraphics(0);
-      }
-    else if(digitalRead(WIO_5S_DOWN) == LOW){
-      selection=1;
-      drawGraphics(1);
-      }
 
-    for(int i=0;i<2;i++){
-      tft.setCursor((320 - tft.textWidth(menuNames[i]))/2, 20+i*40);
-      tft.print(menuNames[i]);
-      }
-    }
-   return selection;  
-}
-
-
-
-void drawGraphics(int s){
-  tft.drawRect(x,y,280,40,green);
-  x=20;
-  y=10 + 40*s;
-  tft.drawRect(x,y,280,40,31);
-}
-
-
-void reset_wio(){
+void reset_wio(){ //resets all the training data to 0 
       DCount=0;
       state="Training";
       state_flag=true;
