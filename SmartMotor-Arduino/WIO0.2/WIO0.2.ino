@@ -6,6 +6,14 @@
 Servo myservo1;
 #define SPEAKER D1
 
+//rotary sensor variables
+#define ROTARY A0
+#define ADC_REF 5 
+#define GROVE_VCC 5 
+#define FULL_ANGLE 1000
+
+
+
 int red=31<<11;
 int green =63<<5;
 int blue= 31<<0;
@@ -217,8 +225,8 @@ void setup() {
   
   tft.fillScreen(green);
   
-  //myservo1.attach(D1); //Servo
-  pinMode(SPEAKER,OUTPUT);   //Speaker
+  myservo1.attach(SDA); //Servo
+  //pinMode(SPEAKER,OUTPUT);   //Speaker
   
   pinMode(WIO_5S_UP,INPUT);
   pinMode(WIO_5S_DOWN,INPUT);
@@ -480,14 +488,14 @@ int showmotor(int pos){
 }
 
 
-void Play(int pos){
+void Play(int pos, int dur){
 
-  for(int i=0;i<100;i++)
+  for(int i=0;i< dur;i++)
     {
         digitalWrite(SPEAKER,HIGH);
-        delay(pos);
+        delay(pos/10);
         digitalWrite(SPEAKER,LOW);
-        delay(pos);
+        delay(pos/10);
     }
 }
 
@@ -495,8 +503,14 @@ void Play(int pos){
 int smartMotor(){
   wiodisplay();
   while(digitalRead(WIO_KEY_C)){
+
     brightness = analogRead(WIO_LIGHT);  
     brightness=150*(1-pow(2,-1*float(brightness)/300));
+    
+
+
+   
+    Serial.println(brightness);
 
     
     if (abs(old_brightness-brightness)>10 || old_pos!=pos){ 
@@ -514,8 +528,8 @@ int smartMotor(){
       while (digitalRead(WIO_5S_LEFT) == LOW){
             count=count+1;
             pos = pos-inc ;
-           // myservo1.write(pos);
-           Play(pos);
+           myservo1.write(pos);
+           //Play(pos,30);
            
             pos = max(0, min(pos,180));
             if (count>5){
@@ -532,8 +546,8 @@ int smartMotor(){
        while (digitalRead(WIO_5S_RIGHT) == LOW){
             count=count+1;
             pos = pos+inc ;
-            //myservo1.write(pos);
-            Play(pos);
+            myservo1.write(pos);
+            //Play(pos,30);
             
             pos = max(0, min(pos,180));
             if (count>5){
@@ -618,19 +632,16 @@ int smartMotor(){
               pos=training[i][0];  
             }
           }
-         //myservo1.write(pos);
-         Play(pos);
+         myservo1.write(pos);
+         //Play(pos,5);
          if (pos!=old_pos & graphMode==true){
          showmotor(pos);
          old_brightness=brightness;
          old_pos=pos;
         }
-          delay(100);
-        }
-
-      
-      }
-       
+          //delay(100);
+        }     
+      }      
   }
   reset_wio();
 
