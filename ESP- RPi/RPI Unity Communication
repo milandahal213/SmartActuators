@@ -1,0 +1,36 @@
+
+
+Flask Server part:
+
+from flask import Flask, redirect, url_for, request,jsonify
+
+app = Flask(__name__)
+
+@app.route('/<serial>',methods = ['GET', 'POST'])
+def setting(serial):
+   if request.method == 'POST':
+      content = request.json
+      print(content)
+      return jsonify({"light":36})
+
+
+if __name__ == "__main__":
+  app.run(host='0.0.0.0',debug=True)
+
+
+
+ESP part:
+
+import usocket
+PORT = 5000
+url='192.168.1.2' #replace this with RPi ip
+
+addr = usocket.getaddrinfo(url, PORT)[0][4]
+client = usocket.socket(usocket.AF_INET, usocket.SOCK_STREAM)
+client.connect(addr)
+client.settimeout(5)
+
+request='POST /D2HKY HTTP/1.1\r\n{'Fred':99}\r\n\r\n'
+client.write(request)
+response = client.read(1024)
+
