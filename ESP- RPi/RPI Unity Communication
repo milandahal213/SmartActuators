@@ -21,16 +21,34 @@ if __name__ == "__main__":
 
 ESP part:
 
+import network
+wlan=network.WLAN()
+wlan.active(True)
+while not wlan.isconnected():
+	wlan.connect("Tufts_Wireless","")
+
 import usocket
 PORT = 5000
-url='192.168.1.2' #replace this with RPi ip
+base='192.168.50.10' #replace this with RPi ip
+base='10.245.91.56'
 
-addr = usocket.getaddrinfo(url, PORT)[0][4]
+addr = usocket.getaddrinfo(base, PORT)[0][4]
 client = usocket.socket(usocket.AF_INET, usocket.SOCK_STREAM)
 client.connect(addr)
 client.settimeout(5)
 
-request='POST /D2HKY HTTP/1.1\r\n{'Fred':99}\r\n\r\n'
+
+payload = {'light':15}
+payload = ujson.dumps(payload)
+request='POST /ESP/haha HTTP/1.1\r\n'
+request += 'Host: %s\r\n' % base
+request += 'Content-Type: application/json\r\n'
+request += 'Accept: application/json\r\n'
+request += 'Content-Length: %d\r\n\r\n' % len(payload)
+request += '%s\r\n\r\n' % payload
+
 client.write(request)
 response = client.read(1024)
+
+
 
