@@ -376,6 +376,7 @@ char  *sendESP(char *mess) {
   Serial1.flush();
   while (!Serial1.available());
   c = ' ';
+  prev_time = rtc.now().unixtime();
   do {
     if (Serial1.available()) {
       c = Serial1.read();
@@ -383,10 +384,15 @@ char  *sendESP(char *mess) {
       ending[len] = c;
       ending[len + 1] = '\0';
     }
-  } while (String(ending).indexOf(">>>") < 0);
+  } while (String(ending).indexOf(">>>") < 0 && (rtc.now().unixtime() - prev_time) < 2 );
 
   Serial1.flush();
+  if (String(ending).indexOf(">>>") >0){
   return (ending);
+  }
+  else{
+    return("ERROR");
+  }
 }
 
 int parseTData() {
@@ -468,18 +474,28 @@ int getDataFromSM() {
   int ret = 0;
   while (ret == 0) {
     Serial1.print("\x03");
-    sendESP("import trainData\r\n");
+    _ret=sendESP("import trainData\r\n");
+    Serial.print("**********");
+    Serial.print(_ret);
+    Serial.print("**********");
     SMmessage = sendESP("trainData.data\r\n");
     Serial.print(SMmessage);
+
+    Serial.print("**********");
     ret = parseTData();
+    Serial.print(ret);
+    Serial.print("##########");
   }
   return ret;
 }
 
 
 void runSM() {
-  sendESP("import main\r\n");
+  _ret=sendESP("import main\r\n");
+  Serial.print(_ret);
+  Serial.print("in here");
   Serial1.print("main.loop()\r\n");
+  Serial.print("after in here");
 }
 
 int drawGraphItems() {
@@ -551,8 +567,9 @@ void loop() {
         tft.fillScreen(TFT_GREEN);
         Serial1.print("\x03");
         int DataCount = getDataFromSM(); //stop main loop_ get training data
-
         runSM();         // restart main.py
+        delay(1000);
+        Serial.print("here");
         while (digitalRead(WIO_KEY_A) == HIGH){
           drawGraph(DataCount);       //draw the graph
           drawGraphItems();  //grab data from SM and plot on the screen
