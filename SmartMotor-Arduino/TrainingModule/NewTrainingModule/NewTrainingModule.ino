@@ -15,7 +15,7 @@ int tDataLength = 0;
 int oldx = 0;
 int oldy = 0;
 
-int _index = 2;
+int _index[2] = {2, 1};
 
 char ending[500];
 char *SMmessage;
@@ -23,7 +23,7 @@ char *SMmessage;
 int x[16] = {5, 85, 165, 245, 5, 85, 165, 245, 5, 85, 165, 245, 5, 85, 165, 245};
 int y[16] = {5, 5, 5, 5, 65, 65, 65, 65, 125, 125, 125, 125, 185, 185, 185, 185};
 
-int menu[2][16] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0}, {0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0}};
+int menu[2][16] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0}, {0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, }};
 
 
 #define LCD_BACKLIGHT (72Ul) // Control Pin of LCD
@@ -311,7 +311,7 @@ void drawGraph(int DC) {
   tft.drawString("0", 72, 230 );
   tft.drawString("180", 252, 230 );
   tft.drawString("MOTOR Position", 110, 230 );
-  tft.drawLine(50, 50, 50, 220, TFT_RED);
+  tft.drawLine(50, 70, 50, 220, TFT_RED);
   tft.drawLine(40, 220, 50, 220, TFT_RED);
   tft.drawLine(40, 70, 50, 70, TFT_RED);
   tft.drawString("MIN", 20, 220 );
@@ -319,8 +319,8 @@ void drawGraph(int DC) {
   tft.setRotation(2);
   tft.drawString("LIGHT INTENSITY", 50, 30 );
   tft.setRotation(3);
-  for(int i=0; i<DC; i++){
-    tft.fillCircle(75+ tData[i][0],220 - 150*(1-pow(2,-1*float(tData[i][1])/300)) ,5,TFT_BLUE);
+  for (int i = 0; i < DC; i++) {
+    tft.fillCircle(75 + tData[i][0], 220 - 150 * (1 - pow(2, -1 * float(tData[i][1]) / 300)) , 5, TFT_BLUE);
   }
 }
 
@@ -387,11 +387,11 @@ char  *sendESP(char *mess) {
   } while (String(ending).indexOf(">>>") < 0 && (rtc.now().unixtime() - prev_time) < 2 );
 
   Serial1.flush();
-  if (String(ending).indexOf(">>>") >0){
-  return (ending);
+  if (String(ending).indexOf(">>>") > 0) {
+    return (ending);
   }
-  else{
-    return("ERROR");
+  else {
+    return ("ERROR");
   }
 }
 
@@ -474,7 +474,7 @@ int getDataFromSM() {
   int ret = 0;
   while (ret == 0) {
     Serial1.print("\x03");
-    _ret=sendESP("import trainData\r\n");
+    _ret = sendESP("import trainData\r\n");
     Serial.print("**********");
     Serial.print(_ret);
     Serial.print("**********");
@@ -491,23 +491,34 @@ int getDataFromSM() {
 
 
 void runSM() {
-  _ret=sendESP("import main\r\n");
-  Serial.print(_ret);
-  Serial.print("in here");
+  sendESP("import main\r\n");
   Serial1.print("main.loop()\r\n");
-  Serial.print("after in here");
 }
+
 
 int drawGraphItems() {
   int t = scanSMData();
-   tft.drawCircle(oldx,oldy,5,TFT_GREEN);
+  tft.drawCircle(oldx, oldy, 5, TFT_GREEN);
   if (t == 1 && validConnection() == 1) {
-    tft.drawString(Name[2], 10, 50);
-    tft.drawString(Name[3], 10, 70);
-    tft.drawCircle(75+atoi(Name[3]),220 -150*(1-pow(2,-1*float(atoi(Name[2]))/300)),5,TFT_RED);
+    tft.drawCircle(75 + atoi(Name[3]), 220 - 150 * (1 - pow(2, -1 * float(atoi(Name[2])) / 300)), 5, TFT_RED);
   }
-  oldx=75+atoi(Name[3]);
-  oldy=220 -150*(1-pow(2,-1*float(atoi(Name[2]))/300));
+  oldx = 75 + atoi(Name[3]);
+  oldy = 220 - 150 * (1 - pow(2, -1 * float(atoi(Name[2])) / 300));
+  return 1;
+}
+
+int drawDashboardItems() {
+  int t = scanSMData();
+
+  tft.drawRect(75,75, 50, oldx, TFT_GREEN);
+  tft.drawRect(220,75,50,oldy, TFT_GREEN);
+
+  if (t == 1 && validConnection() == 1) {
+    tft.drawRect(75,75, 50, 75 + atoi(Name[3]), TFT_RED);
+    tft.drawRect(220,75,50,220 - 150 * (1 - pow(2, -1 * float(atoi(Name[2])) / 300)), TFT_RED);
+  }
+  oldx = 75 + atoi(Name[3]);
+  oldy = 220 - 150 * (1 - pow(2, -1 * float(atoi(Name[2])) / 300));
   return 1;
 }
 
@@ -524,57 +535,92 @@ void loop() {
 
   if (digitalRead(BCM18)) { //connected to a SM system // triggers the scan and display function
     int t = scanSMData(); //displays the name of the motor and type == if the return is 0 something is wrong
-    Serial.print(t);
+
     if (t == 1 && validConnection() == 1) {
       tft.fillScreen(TFT_DARKGREEN);
       tft.setTextColor(TFT_WHITE, TFT_WHITE);
       tft.setTextSize(2);
       tft.drawString(Name[0], 10, 10);
-      int nameWidth= tft.textWidth(Name[0]);
+      int nameWidth = tft.textWidth(Name[0]);
       tft.setTextSize(1);
       tft.setTextColor(textColor, textColor);
-      tft.drawString(" is connected", nameWidth +10 ,15);
-      tft.drawString("You are a Smart ", 10 ,35);
-      int nameWidth2= tft.textWidth("You are a Smart ");
+      tft.drawString(" is connected", nameWidth + 10 , 15);
+      tft.drawString("You are a Smart ", 10 , 35);
+      int nameWidth2 = tft.textWidth("You are a Smart ");
       tft.setTextSize(2);
       tft.setTextColor(TFT_PURPLE, TFT_PURPLE);
-      tft.drawString(Name[1], 10 + nameWidth2 +10, 30);
-      drawEmptyBoxes(0, _index, TFT_RED, TFT_WHITE);
-      while (digitalRead(WIO_KEY_A) == HIGH) {
+      tft.drawString(Name[1], 10 + nameWidth2 + 10, 30);
+      drawEmptyBoxes(0, _index[0], TFT_RED, TFT_WHITE);
 
 
-
-        if (digitalRead(WIO_5S_LEFT) == LOW && _index > 1 ) {
+      //run in loop until the button is pressed - First menu
+      while (digitalRead(WIO_5S_PRESS) == HIGH) {
+        if (digitalRead(WIO_5S_LEFT) == LOW && _index[0] > 1 ) {
           while (digitalRead(WIO_5S_LEFT) == LOW);
-          _index -= 1;
-          drawEmptyBoxes(0, _index, TFT_RED, TFT_WHITE);
+          _index[0] -= 1;
+          drawEmptyBoxes(0, _index[0], TFT_RED, TFT_WHITE);
         }
-        if (digitalRead(WIO_5S_RIGHT) == LOW && _index < 2) {
+        if (digitalRead(WIO_5S_RIGHT) == LOW && _index[0] < 2) {
           while (digitalRead(WIO_5S_RIGHT) == LOW);
-          _index += 1;
-          drawEmptyBoxes(0, _index, TFT_RED, TFT_WHITE);
+          _index[0] += 1;
+          drawEmptyBoxes(0, _index[0], TFT_RED, TFT_WHITE);
         }
       }
-      while (digitalRead(WIO_KEY_A) == LOW);
-      if (_index == 1) {
+      while (digitalRead(WIO_5S_PRESS) == LOW);
+
+
+      // selection to train new data
+      if (_index[0] == 1) {
         Serial.print("train new data");
       }
 
-      if (_index == 2) {
-        drawEmptyBoxes(0, 0, TFT_GREEN, TFT_GREEN);
+
+      // selection to display data
+      if (_index[0] == 2) {
+        //drawEmptyBoxes(0, 0, TFT_GREEN, TFT_GREEN);
         tft.fillScreen(TFT_GREEN);
-        tft.drawString("Getting Data from SM ... ", 10, 100);
+        tft.drawString("Getting Data... ", 10, 100);
+        delay(500);
         tft.fillScreen(TFT_GREEN);
         Serial1.print("\x03");
         int DataCount = getDataFromSM(); //stop main loop_ get training data
         runSM();         // restart main.py
-        delay(1000);
-        Serial.print("here");
-        while (digitalRead(WIO_KEY_A) == HIGH){
-          drawGraph(DataCount);       //draw the graph
-          drawGraphItems();  //grab data from SM and plot on the screen
+        drawEmptyBoxes(1, 1, TFT_BLUE, TFT_WHITE);
+        int menu2State = 1;
+        while (menu2State != 3) {
+          if (digitalRead(WIO_5S_PRESS) == LOW) {
+            while (digitalRead(WIO_5S_PRESS));
+            menu2State = _index[1];
+            tft.fillRect(5, 75, 245, 165, TFT_GREEN);
           }
-          _index=2;
+          if (digitalRead(WIO_5S_LEFT) == LOW && _index[1] > 1 ) {
+            while (digitalRead(WIO_5S_LEFT) == LOW);
+            _index[1] -= 1;
+            drawEmptyBoxes(1, _index[1], TFT_RED, TFT_WHITE);
+            
+          }
+          if (digitalRead(WIO_5S_RIGHT) == LOW && _index[1] < 3) {
+            while (digitalRead(WIO_5S_RIGHT) == LOW);
+            _index[1] += 1;
+            drawEmptyBoxes(1, _index[1], TFT_RED, TFT_WHITE);
+
+            
+          }
+          if (menu2State == 1) {
+
+              //drawDashboard();       //draw the Dashboard
+              drawDashboardItems();  //grab data from SM and plot on the screen
+            
+              
+            }
+          if (menu2State == 2) {
+              drawGraph(DataCount);       //draw the graph
+              drawGraphItems();  //grab data from SM and plot on the screen
+            }
+
+        }
+        _index[0] = 2;
+        _index[1] = 1;
       }
     }
     else
