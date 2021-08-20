@@ -374,7 +374,14 @@ char  *sendESP(char *mess) {
   }
   Serial1.print(mess);
   Serial1.flush();
-  while (!Serial1.available());
+ 
+  prev_time = rtc.now().unixtime();
+  while (!Serial1.available()){
+    if((rtc.now().unixtime() - prev_time) > 2){
+      return("ERROR");
+    }
+  }
+  
   c = ' ';
   prev_time = rtc.now().unixtime();
   do {
@@ -472,19 +479,15 @@ void setup() {
 
 int getDataFromSM() {
   int ret = 0;
+  prev_time = rtc.now().unixtime();
   while (ret == 0) {
     Serial1.print("\x03");
     _ret = sendESP("import trainData\r\n");
-    Serial.print("**********");
-    Serial.print(_ret);
-    Serial.print("**********");
     SMmessage = sendESP("trainData.data\r\n");
-    Serial.print(SMmessage);
-
-    Serial.print("**********");
     ret = parseTData();
-    Serial.print(ret);
-    Serial.print("##########");
+    if((rtc.now().unixtime() - prev_time) > 2 ) {
+      break;
+    }
   }
   return ret;
 }
@@ -499,6 +502,9 @@ void runSM() {
 int drawGraphItems() {
   int t = scanSMData();
   tft.drawCircle(oldx, oldy, 5, TFT_GREEN);
+  if (t==0){
+    return 0;
+  }
   if (t == 1 && validConnection() == 1) {
     tft.drawCircle(75 + atoi(Name[3]), 220 - 150 * (1 - pow(2, -1 * float(atoi(Name[2])) / 300)), 5, TFT_RED);
   }
