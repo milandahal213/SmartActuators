@@ -14,6 +14,11 @@ int tDataLength = 0;
 #define w 70
 #define h 50
 
+
+  int X=12;  //for Dashboard values
+  int Y=70;
+  int widthRect2=15;
+  
 int oldx = 0;
 int oldy = 0;
 
@@ -22,6 +27,9 @@ int oldMotor=0;
 
 int _index[2] = {2, 1};
 
+
+//colors
+int page1bg=TFT_BLUE;
 #define Motor TFT_GREEN
 
 char ending[500];
@@ -30,7 +38,7 @@ char *SMmessage;
 int x[16] = {5, 85, 165, 245, 5, 85, 165, 245, 5, 85, 165, 245, 5, 85, 165, 245};
 int y[16] = {5, 5, 5, 5, 65, 65, 65, 65, 125, 125, 125, 125, 185, 185, 185, 185};
 
-int menu[2][16] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1}, {0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, }};
+int menu[2][16] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1}, {0, 1, 1, 1, 0, 0, 0, 0, 0, 0,0 , 1, 0, 0, 0,0 }};
 char menuWORD[3][4][20] = {{"Train", "View", "Setting"}, {"View1", "Graph", "Quit"}};
 
 #define LCD_BACKLIGHT (72Ul) // Control Pin of LCD
@@ -340,7 +348,7 @@ void drawGraph(int DC) {
   tft.drawLine(50, 220, 300, 220, TFT_RED);
   tft.drawLine(75, 220, 75, 230, TFT_RED);
   tft.drawLine(255, 220, 255, 230, TFT_RED);
-  tft.drawString("0", 72, 230 );
+  tft.drawString("0", 32, 230 );
   tft.drawString("180", 252, 230 );
   tft.drawString("MOTOR Position", 110, 230 );
   tft.drawLine(50, 70, 50, 220, TFT_RED);
@@ -352,7 +360,7 @@ void drawGraph(int DC) {
   tft.drawString("LIGHT INTENSITY", 50, 30 );
   tft.setRotation(3);
   for (int i = 0; i < DC; i++) {
-    tft.fillCircle(75 + tData[i][0], 220 - 150 * (1 - pow(2, -1 * float(tData[i][1]) / 300)) , 5, TFT_BLUE);
+    tft.fillCircle(35 + tData[i][0], 220 - 150 * (1 - pow(2, -1 * float(tData[i][1]) / 300)) , 5, TFT_BLUE);
   }
 }
 
@@ -361,27 +369,40 @@ void drawDashboard() {
 
   tft.setTextSize(2);
 
-  tft.fillRoundRect(45, 70, 60, 160, 10, TFT_BLUE);
-  tft.drawRoundRect(45, 70, 60, 160, 10, TFT_BLACK);
-  tft.fillRoundRect(75, 75, 25, 150, 10, TFT_WHITE);
-  tft.fillCircle(210, 150, 80, TFT_BLUE);
-  tft.drawCircle(210, 150, 80, TFT_BLACK);
-  tft.fillCircle(210, 150, 50, TFT_WHITE);
+
+  int heightRect2=150;
+  int radius1=50;
+  int radius2=80;  
+  
+
+
+  
+  int heightRect1=heightRect2+10;
+  int widthRect1=widthRect2+35;
+  int xc= X+135;
+  int yc= Y + 80;
+  tft.fillRoundRect(X-2,Y-2,xc+radius2+4, heightRect1+4,10,32);
+  tft.fillRoundRect(X, Y, widthRect1, heightRect1, 10, TFT_BLUE);
+  tft.drawRoundRect(X, Y, widthRect1, heightRect1, 10, TFT_BLACK);
+  tft.fillRoundRect(X+30, Y+5, widthRect2, heightRect2, 10, TFT_WHITE);
+  tft.fillCircle(xc, yc, radius2, TFT_BLUE);
+  tft.drawCircle(xc, yc, radius2, TFT_BLACK);
+  tft.fillCircle(xc, yc, radius1, TFT_WHITE);
   tft.setTextColor(TFT_WHITE, TFT_WHITE);
-  tft.drawString("0 ", 206, 78 );
+  tft.drawString("0 ", xc-4, yc-radius1-25);
   tft.setTextColor(TFT_WHITE, TFT_BLUE);
-  tft.drawString(Name[1], 185, 208 );
+  tft.drawString(Name[1], xc-25, yc +radius1 + 8 );
   tft.setRotation(2);
-  tft.drawString("LIGHT", 50, 50 );
+  tft.drawString("LIGHT", 60, X+5 );
   tft.setTextColor(TFT_WHITE, TFT_WHITE);
-  tft.drawString("CW", 78, 140 );
+  tft.drawString("CW", 78, xc-radius1-25 );
   tft.setRotation(0);
-  tft.drawString("CCW ", 138, 36 );
+  tft.drawString("CCW ", 138,  320-xc-radius1-25 );
   tft.setRotation(3);
   
-  tft.drawLine(155, 150, 165, 150, TFT_RED);
-  tft.drawLine(255, 150, 265, 150, TFT_RED);
-  tft.drawLine(210, 95, 210, 105, TFT_RED);
+  tft.drawLine(xc-radius1-5, yc, xc-radius1+5, yc, TFT_RED);
+  tft.drawLine(xc+radius1-5, yc, xc+radius1+5, yc, TFT_RED);
+  tft.drawLine(xc, yc - radius1-5, xc, yc - radius1+5, TFT_RED);
 
   tft.setTextSize(1);
 
@@ -578,17 +599,24 @@ int drawGraphItems() {
 }
 
 int drawDashboardItems() {
+
+
+  int xc= X+135;
+  int yc= Y + 80;
+  int widthLight=widthRect2-5;
+  int xR= X+30+ int(widthRect2/2)- int(widthLight/2); 
+  
   int t = scanSMData();
   int light=150 * (1 - pow(2, -1 * float(atoi(Name[2])) / 300));
   int motor=atoi(Name[3]);
 
 
   if (t == 1 && validConnection() == 1) {
-    tft.fillRect( 80,215-oldLight, 15, oldLight, TFT_WHITE);
-    tft.drawLine(210, 150, 210-int(50*cos(oldMotor*PI/180)), 150- int(50*sin(oldMotor*PI/180)),TFT_WHITE); 
+    tft.fillRect( xR,215-oldLight, widthLight, oldLight, TFT_WHITE);
+    tft.drawLine(xc, yc, xc-int(50*cos(oldMotor*PI/180)), yc- int(50*sin(oldMotor*PI/180)),TFT_WHITE); 
     
-    tft.drawLine(210, 150, 210- int(50*cos(motor*PI/180)),150- int(50*sin(motor*PI/180)),TFT_BLACK); 
-    tft.fillRect(80,215-light,15,light, TFT_RED);
+    tft.drawLine(xc, yc, xc- int(50*cos(motor*PI/180)),yc- int(50*sin(motor*PI/180)),TFT_BLACK); 
+    tft.fillRect(xR,215-light,widthLight,light, TFT_RED);
    
 
     oldLight = light;
@@ -606,7 +634,7 @@ void loop() {
     int t = scanSMData(); //displays the name of the motor and type == if the return is 0 something is wrong
 
     if (t == 1 && validConnection() == 1) {
-      tft.fillScreen(TFT_DARKGREEN);
+      tft.fillScreen(page1bg);
       tft.setTextColor(TFT_WHITE, TFT_WHITE);
       tft.setTextSize(2);
       tft.drawString(Name[0], 10, 10);
@@ -666,7 +694,7 @@ void loop() {
           if (digitalRead(WIO_5S_PRESS) == LOW) {
             while (digitalRead(WIO_5S_PRESS));
             menu2State = _index[1];
-            tft.fillRect(5, 70, 300, 200, TFT_GREEN);
+            tft.fillRect(0, 65, 320, 240, TFT_GREEN);
             Serial.print("pressed");
             if(menu2State==1) drawDashboard();  
             if(menu2State==2) drawGraph(DataCount);       //draw the graph
