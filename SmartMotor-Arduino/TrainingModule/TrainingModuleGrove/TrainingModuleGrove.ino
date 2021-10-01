@@ -6,7 +6,6 @@ DateTime now;
 #define SPEAKER D1
 #define ROTARY A0
 int prev_time, currenttime;
-
 int tData[30][2];
 int trainingData[30][2];
 int count = 0;
