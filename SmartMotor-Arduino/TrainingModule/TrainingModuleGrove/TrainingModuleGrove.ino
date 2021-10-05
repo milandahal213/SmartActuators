@@ -1422,7 +1422,7 @@ void loop() {
       strcpy(Name[1], "");
       strcpy(Name[2], "");
       strcpy(Name[3], "");
-      wipeClean("Motor", "Hipseter");
+      
 
     }
 
