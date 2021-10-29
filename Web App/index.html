@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Yaakov's Uniden Web Demo</title>
+        <link rel="stylesheet" type="text/css" href="site.css" />
+        <script defer type="text/javascript" src="serial.js"></script>
+        <script defer type="text/javascript" src="site.js"></script>
+    </head>
+
+    <body>
+        <header>
+            <h2>Yaakov's Uniden Web Demo</h2>
+        </header>
+        <noscript>
+            <p>This site requires Javascript.</p>
+        </noscript>
+        <div class="noserial hidden">
+            <p>This site requires the experimental Web Serial API. Your browser either does not support this, or does not have it enabled.</p>
+        </div>
+        <div class="connect">
+            <form action="#" method="POST" onsubmit="connect(); return false;">
+                <input type="submit" value="Connect">
+
+                <button type="button" onclick="readit();">Draw Graph</button>
+            </form>
+        </div>
+        <br />
+        
+                <div class="name">
+            <textarea readonly="true" style="min-height:10px; min-width: 500px"></textarea>
+            
+        </div>
+                <div class="light">
+            <textarea readonly="true" style="min-height:10px; min-width: 500px"></textarea>
+            
+        </div>
+                <div class="motor">
+            <textarea readonly="true" style="min-height:10px; min-width: 500px"></textarea>
+            
+        </div>
+<div>
+        <canvas id="myCanvas" width="400" height="400" style="border:1px solid #000000;">
+</canvas>
+</div>
+    </body>
+</html>
