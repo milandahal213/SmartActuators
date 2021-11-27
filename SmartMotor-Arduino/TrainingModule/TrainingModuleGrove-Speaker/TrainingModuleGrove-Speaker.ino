@@ -137,11 +137,16 @@ void Test() {
 
 
 void resetSM() {
+  //_ret=sendESP("\x03\r\n");
+  //_ret=sendESP("\x04\r\n");
+  //_ret=sendESP("\x04\r\n");
+  //_ret=sendESP("\x04\r\n");
+  //_ret=sendESP("\x04\r\n");
   Serial1.print("\x04\r\n");
-  int DataCount = getDataFromSM(); //stop main loop_ get training data
-  runSM();         // restart main.py
-}
+  //_ret=sendESP("import main\r\n");
+  //Serial1.print("loop()\r\n");
 
+}
 void loadTrain() {
   char *training = "";
   char Tspeed[5];
@@ -840,7 +845,7 @@ void setup() {
   tft.fillScreen(TFT_GREEN);
   rtc.begin();
   rtc.adjust(now);
-  tft.fillScreen(TFT_RED);
+   tft.fillScreen(TFT_RED);
 }
 
 void loop() {
@@ -932,7 +937,7 @@ void loop() {
         GraphState = false;
 
         Tlight = light();
-        Tmotor = map(analogRead(ROTARY), 0, 1023, 21, 140);
+        Tmotor = map(analogRead(ROTARY), 0, 1023, 0, 180);
         tft.fillRect(5, 60, 235, 175, dashboardBG);
         drawDashboard();
         drawDashboardItemsTrain(Tlight, Tmotor);
@@ -1055,11 +1060,7 @@ void loop() {
                     tft.setTextSize(1);
                     tft.drawString("Please wait!!", 160 - tft.textWidth("Please wait!!") / 2, 180);
                     loadTrain();
-                    Serial1.print("\x03");
-                    resetSM();
                     training = "training=[(30,300),(75,100)]\r\n";
-                    delay(500);
-                           scanSMData();
                     breakcase = true;
                     break;
                   }
@@ -1111,7 +1112,7 @@ void loop() {
                 _index[1] = 3;
                 GraphState = false;
                 Tlight = light();
-                Tmotor = map(analogRead(ROTARY), 0, 1023, 21, 140);
+                Tmotor = map(analogRead(ROTARY), 0, 1023, 0, 180);
                 tft.fillRect(5, 60, 235, 175, dashboardBG);
                 drawDashboard();
                 drawDashboardItemsTrain(Tlight, Tmotor);
@@ -1152,8 +1153,8 @@ void loop() {
           if (Tlight == 0) {
             Serial1.print("\x03");
           }
-          Tmotor = map(analogRead(ROTARY), 0, 1023, 21, 140);
-          if (abs(Tmotor - oldSpeed2Send) > 3) {
+          Tmotor = map(analogRead(ROTARY), 0, 1023, 0, 180);
+          if (abs(Tmotor > 150) {
             itoa(Tmotor, Speed, 10);
             strcpy(bufMessage, "pwm2.duty(");
             strcat(bufMessage, Speed);
@@ -1290,7 +1291,7 @@ void loop() {
 
       if (menu1State == 1 && digitalRead(BCM18) == LOW) {
 
-        //Settings menu
+
         /*
         * ***********************************
           Cancel *       *       *
@@ -1374,10 +1375,7 @@ void loop() {
               }
               while (digitalRead(WIO_5S_PRESS) == LOW);
               renameSM(0, _index[4]);
-              Serial1.print("\x03");
               resetSM();
-              delay(500);
-              runSM();
               scanSMData();
               break;
             }
@@ -1427,7 +1425,7 @@ void loop() {
       strcpy(Name[1], "");
       strcpy(Name[2], "");
       strcpy(Name[3], "");
-
+      
 
     }
 
