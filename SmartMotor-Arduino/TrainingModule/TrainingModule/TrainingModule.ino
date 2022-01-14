@@ -1054,12 +1054,19 @@ void loop() {
                     tft.fillScreen(TFT_WHITE);
                     tft.fillRect( 50, 120, 220, 80, TFT_GREEN);
                     tft.setTextSize(2);
-                    tft.drawString("TRAINING MOTOR...", 160 - tft.textWidth("TRAINING MOTOR...") / 2, 150);
+                    tft.drawString("TRAINING BOX...", 160 - tft.textWidth("TRAINING BOX...") / 2, 150);
                     tft.setTextSize(1);
                     tft.drawString("Please wait!!", 160 - tft.textWidth("Please wait!!") / 2, 180);
                     loadTrain();
-                    training = "training=[(30,300),(75,100)]\r\n";
+                    training = "data=[(30,300),(75,100)]\r\n";
+
+                    Serial1.print("\x03");
+                    resetSM();
+                    training = "data=[(30,300),(75,100)]\r\n";
+                    delay(500);
+                    scanSMData();
                     breakcase = true;
+
                     break;
                   }
                   else if (menu3State == 1) {
@@ -1332,7 +1339,7 @@ void loop() {
             if (menu4State == 2) {
               tft.fillScreen(TFT_BLUE);
               Serial1.print("\x03");
-              //training="training=[(65,10),(75,300)]\r\n";   //redefine training with default values
+              training="data=[(65,10),(75,300)]\r\n";   //redefine training with default values
               Serial.println("Updating with new firmware");
               wipeClean("Motor", "Banana");
               break;
