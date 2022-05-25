@@ -1,1 +1,1 @@
-'\ntype="Motor"\nName="Hipster"\n'
+\ntype="Motor"\nName="Hipster"\n
