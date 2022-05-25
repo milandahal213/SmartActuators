@@ -37,16 +37,19 @@ char *dataGeneral; //general data from SPIKE
 
 //SPIRTE data
 int x = 320;
-float scrollSpeed=1;
+float scrollSpeed = 1;
 //SPIKE port data
 
 String dat;
 String addr[10];
 int _RSSIvalue[10];
 String state = "";
-String screen="Stream"; //default value
+String screen = "Stream"; //default value
 int menuState = 0;
 int oldmenuState = 0;
+
+bool wasOne = false;
+bool wasTwo = false;
 //63- Force
 //65 - Small Motor
 //62 - Distance
@@ -76,12 +79,12 @@ void scanBLE() {
 void switchLEFT() {
   Serial.println("Button LEFT ");
   tft.fillScreen(TFT_BLUE);
-  screen="Stream";
+  screen = "Stream";
 }
 void switchRIGHT() {
   Serial.println("Button RIGHT ");
   tft.fillScreen(TFT_GREEN);
-  screen="General";
+  screen = "General";
 
 }
 void connectBLE() {
@@ -150,11 +153,11 @@ bool connectToServer() {
   Serial.println(" - Found our characteristic");
   // Read the value of the characteristic.
 
-    Serial.println("One done");
+  Serial.println("One done");
   if (RRemoteCharacteristic->canNotify()) {
     RRemoteCharacteristic->registerForNotify(notifyCallback);
   }
-  
+
 
   Serial.println("callback set");
   connected = true;
@@ -278,7 +281,7 @@ void showMessage(String msg, int posx, int posy) {
 
   img.setCursor(posx, 0); // Print text at xpos - sprite width
   img.print(msg);
-  img.setCursor(posx-360, 0);  // Print text at xpos
+  img.setCursor(posx - 360, 0); // Print text at xpos
   img.print(msg);
   img.pushSprite(60, posy);
   img.deleteSprite();
@@ -310,7 +313,7 @@ void build_banner(String msg) {
 void MOTOR(uint8_t *port , int value) {
   img.createSprite(50, 50);
   img.fillSprite(TFT_WHITE);
-    img.setTextFont(1); 
+  img.setTextFont(1);
   img.fillCircle(25, 15, 10, TFT_BLACK);
   img.fillCircle(25, 15, 9, TFT_WHITE);
 
@@ -324,11 +327,11 @@ void MOTOR(uint8_t *port , int value) {
 }
 
 
-int color[11]={TFT_BLACK, TFT_BLACK, TFT_BLACK,TFT_BLACK,TFT_BLUE, TFT_GREEN, TFT_BLACK,TFT_YELLOW, TFT_BLACK,TFT_RED, TFT_WHITE};
+int color[11] = {TFT_BLACK, TFT_BLACK, TFT_BLACK, TFT_BLACK, TFT_BLUE, TFT_GREEN, TFT_BLACK, TFT_YELLOW, TFT_BLACK, TFT_RED, TFT_WHITE};
 void COLOR(uint8_t *port , int value) {
   img.createSprite(50, 50);
   img.fillSprite(TFT_WHITE);
-    img.setTextFont(1); 
+  img.setTextFont(1);
   img.fillRect(15, 5, 20, 20, TFT_BLACK);
   img.fillRect(16, 6, 18, 18, TFT_WHITE);
   img.drawCircle(25, 15, 5, TFT_BLACK);
@@ -346,7 +349,7 @@ void COLOR(uint8_t *port , int value) {
 void DISTANCE(uint8_t *port , int value) {
   img.createSprite(50, 50);
   img.fillSprite(TFT_WHITE);
-  img.setTextFont(1); 
+  img.setTextFont(1);
   img.drawRoundRect(10, 8, 30, 18, 4, TFT_BLACK);
   img.fillRect(14, 12, 22, 8, TFT_BLACK);
   img.drawCircle(16, 16, 3, TFT_WHITE);
@@ -363,7 +366,7 @@ void DISTANCE(uint8_t *port , int value) {
 void FORCE(uint8_t *port , int value) {
   img.createSprite(50, 50);
   img.fillSprite(TFT_WHITE);
-  img.setTextFont(1); 
+  img.setTextFont(1);
   img.fillRect(15, 5, 20, 20, TFT_BLACK);
   img.fillRect(16, 6, 18, 18, TFT_WHITE);
   img.fillRoundRect(18, 13, 15, 5, 2, TFT_BLACK);
@@ -426,15 +429,13 @@ void GRAPH(int light, int motor) {
 
   img.createSprite(200, 100);
   img.fillSprite(TFT_WHITE);
-  img.setTextFont(1); 
-
-
-  img.fillCircle((motor + 180)/2 , light/1024 * 100 , 8, TFT_RED);
-
-
-  img.pushSprite(10,10);
+  img.setTextFont(1);
+  img.fillCircle((motor + 180) / 2 , light / 1024 * 100 , 8, TFT_RED);
+  img.pushSprite(10, 10);
   img.deleteSprite();
 }
+
+
 void setup() {
   Serial.begin(115200);
   // while (!Serial) {};
@@ -446,8 +447,8 @@ void setup() {
   tft.setRotation(3);
 
   tft.fillScreen(TFT_BLUE);
-img.setTextSize(1);           // Font size scaling is x1
-img.setTextFont(4);           // Font 2 selected
+  img.setTextSize(1);           // Font size scaling is x1
+  img.setTextFont(4);           // Font 2 selected
   img.setTextColor(TFT_BLACK);  // Black text, no background colour
 
 
@@ -475,68 +476,89 @@ img.setTextFont(4);           // Font 2 selected
 void decodeSPIKEdataStream() {
 
   JSONVar myObject = JSON.parse(dataStream);
-  if (int(myObject["m"])==1){
-  types[0] = myObject["A"]["t"];
-  types[1] = myObject["B"]["t"];
-  types[2] = myObject["C"]["t"];
-  types[3] = myObject["D"]["t"];
-  types[4] = myObject["E"]["t"];
-  types[5] = myObject["F"]["t"];
-
-  for (int i = 0; i < myObject["A"]["d"].length(); i++) {
-    recData[0][i] = myObject["A"]["d"][i];
-  }
-
-  for (int i = 0; i < myObject["B"]["d"].length(); i++) {
-    recData[1][i] = myObject["B"]["d"][i];
-  }
-  for (int i = 0; i < myObject["C"]["d"].length(); i++) {
-    recData[2][i] = myObject["C"]["d"][i];
-  }
-  for (int i = 0; i < myObject["D"]["d"].length(); i++) {
-    recData[3][i] = myObject["D"]["d"][i];
-  }
-  for (int i = 0; i < myObject["E"]["d"].length(); i++) {
-    recData[4][i] = myObject["E"]["d"][i];
-  }
-  for (int i = 0; i < myObject["F"]["d"].length(); i++) {
-    recData[5][i] = myObject["F"]["d"][i];
-  }
-
-  for (int i = 0; i < 6; i++) {
-    if (types[i] == 48 || types[i] == 65) {
-      MOTOR(portNames[i], recData[i][1]);
+  if (int(myObject["m"]) == 1) {
+    if (wasOne) {
     }
-    else if (types[i] == 61) {
-      COLOR(portNames[i], recData[i][1]);
+    else{
+      SPIKE(2); //draw SPIKE Sprite
+      wasOne = true;
+      wasTwo = false;
+      tft.fillScreen(TFT_BLUE);
     }
-    else if (types[i] == 62) {
-      DISTANCE(portNames[i], recData[i][0]);
+    types[0] = myObject["A"]["t"];
+    types[1] = myObject["B"]["t"];
+    types[2] = myObject["C"]["t"];
+    types[3] = myObject["D"]["t"];
+    types[4] = myObject["E"]["t"];
+    types[5] = myObject["F"]["t"];
+
+    for (int i = 0; i < myObject["A"]["d"].length(); i++) {
+      recData[0][i] = myObject["A"]["d"][i];
     }
-    else if (types[i] == 63) {
-      FORCE(portNames[i], recData[i][0]);
+
+    for (int i = 0; i < myObject["B"]["d"].length(); i++) {
+      recData[1][i] = myObject["B"]["d"][i];
+    }
+    for (int i = 0; i < myObject["C"]["d"].length(); i++) {
+      recData[2][i] = myObject["C"]["d"][i];
+    }
+    for (int i = 0; i < myObject["D"]["d"].length(); i++) {
+      recData[3][i] = myObject["D"]["d"][i];
+    }
+    for (int i = 0; i < myObject["E"]["d"].length(); i++) {
+      recData[4][i] = myObject["E"]["d"][i];
+    }
+    for (int i = 0; i < myObject["F"]["d"].length(); i++) {
+      recData[5][i] = myObject["F"]["d"][i];
+    }
+
+    for (int i = 0; i < 6; i++) {
+      if (types[i] == 48 || types[i] == 65) {
+        MOTOR(portNames[i], recData[i][1]);
+      }
+      else if (types[i] == 61) {
+        COLOR(portNames[i], recData[i][1]);
+      }
+      else if (types[i] == 62) {
+        DISTANCE(portNames[i], recData[i][0]);
+      }
+      else if (types[i] == 63) {
+        FORCE(portNames[i], recData[i][0]);
+      }
+      else {
+        HIDE(portNames[i]);
+      }
+    }
+  }
+  else {
+    if (wasTwo) {
     }
     else {
-      HIDE(portNames[i]);
+      //draw GRAPH sprite Sprite
+      wasOne = false;
+      wasTwo = true;
+      tft.fillScreen(TFT_GREEN);
     }
-  }}
-  else{
+    //data format
+    // {"m": 2, "data": {"data": [1024, 107], "training": [[3, 104], [3, 104], [-112, 107], [104, 121], [107, 1024]]}}
+    GRAPH(int(myObject["data"]["data"][0]),int( myObject["data"]["data"][1]));
+    
     Serial.println("new data coming");
   }
 }
 
 
 void loop() {
-    Serial.println(state);
-    Serial.println(screen);
-    Serial.println(connected);
+  Serial.println(state);
+  Serial.println(screen);
+  Serial.println(connected);
 
   if (state == "connect" && not connected ) {
     //if the central button is pressed , connect the selected robot
     //scan all the BLE devices with name robot
     //sort find the one that has  largest RSSI -1 > -30
     //connect to the SPIKE with the largest RSSI
-    scrollSpeed=100;
+    scrollSpeed = 100;
     hideMessage(180);
 
     showMessage("Connecting ", 50, 50);
@@ -548,7 +570,6 @@ void loop() {
       if (connectToServer()) {
         hideMessage(50);
         hideMessage(180);
-        SPIKE(2);
         Serial.println("We are now connected to the BLE Server.");
       } else {
         Serial.println("We have failed to connect to the server; there is nothin more we will do.");
@@ -565,8 +586,8 @@ void loop() {
   }
 
   else if (state == "" && not connected) {
-    scrollSpeed=1;
-    showMessage("Press round button to connect!!",x, 180);
+    scrollSpeed = 1;
+    showMessage("Press round button to connect!!", x, 180);
     x = x - 1;
     if (x < 1) {
       x = 320;
