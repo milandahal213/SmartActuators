@@ -1,0 +1,14 @@
+main.py
+
+'\nimport uos, machine,neopixel\nfrom math import log\nimport time\nimport trainData\nimport math\ntraining=trainData.data\nfrom machine import Pin, ADC\nTMConnect=Pin(5,Pin.OUT)\nTMConnect.off()\nSensor = ADC(0)\np2 = machine.Pin(0)\nimport name\nif name.type=="Motor":\n pwm2 = machine.PWM(p2)\n pwm2.freq(50)\n pwm2.duty(75)\nelif name.type=="Speaker":\n pwm2 = machine.PWM(p2)\n pwm2.freq(50)\n pwm2.duty(75)\nelif name.type=="Light":\n np = neopixel.NeoPixel(p2, 8)\n\n\ndef convert(x):\n return int((x * 119 / 1023) + 21)\n\n\n\ndef getfreq(x):\n minFreq = 130.8\n maxFreq = 523.3\n pInc = 1.059463\n numNotes = int(log(maxFreq / minFreq) / log(pInc)) + 1\n TRange = 1023 / numNotes\n for i in range(numNotes):\n  if (x > 0 and x < TRange): \n   return (0)\n  elif (x > TRange * (i) and x < TRange * (i + 1)): \n   return int(minFreq * pow(pInc, (i - 1)))\n return -1\ndef doSomething(d):\n if name.type=="Motor":\n  pwm2.duty(convert(d))\n elif name.type=="Speaker":\n  ff=getfreq(d)\n  print(ff)\n  pwm2.freq(ff)\n elif name.type=="Light":\n  l=0\n  r=0\n  g=0\n  b=0\n  allFlag=1\n  if d<23:\n   allFlag=0\n   pass\n  elif d>23 and d<123:\n   allFlag=0\n   l= math.floor(((d-23)*0.08))\n   r=255\n  elif d>123 and d<223:\n   allFlag=0\n   l= math.floor(((d-123)*0.08))\n   g=255\n  elif d>223 and d<323:\n   allFlag=0\n   l= math.floor(((d-223)*0.08))\n   b=225\n  elif d>323 and d<423:\n   r=math.floor(((d-323)*2.55))\n  elif d>423 and d<523:\n   r=255\n   g=math.floor(((d-423)*2.55))\n  elif d>523 and d<623:\n   r=255-math.floor(((d-523)*2.55))\n   g=255\n  elif d>623 and d<723:\n   g=255\n   b=math.floor(((d-623)*2.55))\n  elif d>723 and d<823:\n   g=255-math.floor(((d-723)*2.55))\n   b=255\n  elif d>823 and d<923:\n   r=math.floor(((d-823)*2.55))\n   b=255\n  elif d>923 and d<1024:\n   r=255\n   g=math.floor(((d-923)*2.55))\n   b=255\n  if allFlag:\n   for i in range(8):\n    np[i] = (r, g, b)\n  else:\n   for i in range(8):\n    np[i] = (0, 0, 0)\n   np[l] = (r, g, b)\n  np.write()\ndef loop():\n while True:\n  sens = Sensor.read()\n  min = 1000\n  pos = 75\n  for (a,l) in training:\n   dist = abs(sens - l)\n   if dist < min:\n    min = dist\n    pos = a\n  doSomething(pos)   \n  print("$",name.Name,name.type,sens,pos, "*")\n  time.sleep(.1)\n\n\n\nloop()\n'
+
+
+
+name.py
+
+'\ntype="Motor"\nName="Twister"\n'
+
+trainData.py
+'data=training=[(200,942),(200,942),(1000,154),(1000,143)]'
+
+

@@ -117,7 +117,7 @@ char *_ret;
 String request;
 
 
-char *training = "training=[(30,300),(75,100)]\r\n";
+char *training = "training=[(50,900),(500,600)]\r\n";
 
 void Test() {
   char *training;
@@ -227,14 +227,13 @@ void loadTrainScript( char *training) {
 }
 
 void wipeClean(char *board, char *nm) {
-  char *training = "training=[(30,300),(90,100)]\r\n";
+  char *training = "training=[(50,900),(500,600)]\r\n";
 
   char *mainScript[] = {
     "\x03\r\n",
     "f=open(\"main.py\",\"w\")\r\n",
     "\x05\r\n",
     "a='''\r\n",
-    "#version0.222a\r\n",
     "import uos, machine,neopixel\r\n",
     "from math import log\r\n",
     "import time\r\n",
@@ -533,7 +532,7 @@ void drawTrainingGraph(int DC) {
   tft.drawString("Sensor Intensity", 50, 10 );
   tft.setRotation(3);
   for (int i = 0; i < DC; i++) {
-    tft.fillCircle(35 + map(trainingData[i][0],0,1023,0,180), 215 - 150 * (1 - pow(2, -1 * float(trainingData[i][1]) / 300)) , 5, TFT_BLUE);
+    tft.fillCircle(35 + map(trainingData[i][0],0,1023,0,180), 215 - mapLightdata(float(trainingData[i][1])) , 5, TFT_BLUE);
   }
 }
 
@@ -541,9 +540,9 @@ void drawTrainingGraph(int DC) {
 int drawGraphItemsTrain(int light, int motor) {
 
   tft.drawCircle(35 + map(oldx,0,1023,0,180), oldy, 5, dashboardBG);
-  tft.drawCircle(35 + map(motor,0,1023,0,180), 220 - 150 * (1 - pow(2, -1 * float(light) / 300)), 5, TFT_RED);
+  tft.drawCircle(35 + map(motor,0,1023,0,180), 220 - mapLightdata(float(light)), 5, TFT_RED);
   oldx = motor ;
-  oldy = 220 - 150 * (1 - pow(2, -1 * float(light) / 300));
+  oldy = 220 - mapLightdata(float(light));
   return 1;
 }
 
@@ -572,10 +571,9 @@ void drawGraph(int DC) {
   tft.drawString("Sensor Intensity", 50, 10 );
   tft.setRotation(3);
   for (int i = 0; i < DC; i++) {
-    tft.fillCircle(35 + map(tData[i][0],0,1023,0,180), 215 - 150 * (1 - pow(2, -1 * float(tData[i][1]) / 300)) , 5, TFT_BLUE);
+    tft.fillCircle(35 + map(tData[i][0],0,1023,0,180), 215 - mapLightdata(float(tData[i][1])) , 5, TFT_BLUE);
   }
 }
-
 
 int drawGraphItems() {
   int t = scanSMData();
@@ -584,10 +582,11 @@ int drawGraphItems() {
     return 0;
   }
   if (t == 1 && validConnection() == 1) {
-    tft.drawCircle(35 + map(atoi(Name[3]),0,1023,0,180), 220 - 150 * (1 - pow(2, -1 * float(atoi(Name[2])) / 300)), 5, TFT_RED);
+    tft.drawCircle(35 + map(atoi(Name[3]),0,1023,0,180), 220 - mapLightdata(float(atoi(Name[2]))), 5, TFT_RED);
+
   }
   oldx =atoi(Name[3]);
-  oldy = 220 - 150 * (1 - pow(2, -1 * float(atoi(Name[2])) / 300));
+  oldy = 220 - mapLightdata( float(atoi(Name[2])));
   return 1;
 }
 
@@ -645,15 +644,15 @@ int drawDashboardItems() {
   int xR = X + 30 + int(widthRect2 / 2) - int(widthLight / 2);
 
   int t = scanSMData();
-  int light = 150 * (1 - pow(2, -1 * float(atoi(Name[2])) / 300));
+  int light = mapLightdata(float(atoi(Name[2])));
   int motor = atoi(Name[3]);
 
 
   if (t == 1 && validConnection() == 1) {
-    float angle=map(oldMotor,0,1023,0,359) * PI / 180;
+    float angle=map(oldMotor,0,1023,0,179) * PI / 180;
     tft.drawLine(xc, yc, xc - int(50 * cos(angle)), yc - int(50 * sin(angle)), TFT_WHITE);
     tft.fillRect( xR, 215 - oldLight, widthLight, oldLight, TFT_WHITE);
-    angle=map(oldMotor,0,1023,0,359) * PI / 180;
+    angle=map(motor,0,1023,0,179) * PI / 180;
     tft.drawLine(xc, yc, xc - int(50 * cos( angle)), yc - int(50 * sin(angle)), TFT_BLACK);
     tft.fillRect(xR, 215 - light, widthLight, light, TFT_RED);
 
@@ -665,7 +664,9 @@ int drawDashboardItems() {
   return 1;
 }
 
-
+float mapLightdata(float sensorVal){
+  return(135 * sensorVal/1024);
+}
 
 //Dashboard for Training menu
 int drawDashboardItemsTrain(int Clight, int motor) {
@@ -675,13 +676,13 @@ int drawDashboardItemsTrain(int Clight, int motor) {
   int yc = Y + 80;
   int widthLight = widthRect2 - 5;
   int xR = X + 30 + int(widthRect2 / 2) - int(widthLight / 2);
-  int light = 150 * (1 - pow(2, -1 * float(Clight) / 300));
+  int light = mapLightdata(float(Clight));
   //int t = scanSMData();
 
-  float angle=map(oldMotor,0,1023,0,359) * PI / 180;
+  float angle=map(oldMotor,0,1023,0,179) * PI / 180;
   tft.fillRect( xR, 215 - oldLight, widthLight, oldLight, TFT_WHITE);
   tft.drawLine(xc, yc, xc - int(50 * cos(angle)), yc - int(50 * sin(angle)), TFT_WHITE);
-  angle=map(motor,0,1023,0,359) * PI / 180;
+  angle=map(motor,0,1023,0,179) * PI / 180;
   tft.drawLine(xc, yc, xc - int(50 * cos(angle)), yc - int(50 * sin(angle)), TFT_BLACK);
   tft.fillRect(xR, 215 - light, widthLight, light, TFT_RED);
 
@@ -957,7 +958,8 @@ void loop() {
           _index[0] -= 1;
           drawEmptyBoxes(0, _index[0], inactiveBG, activeBG);
         }
-        if (digitalRead(WIO_5S_RIGHT) == LOW && _index[0] < 3) {
+        if (digitalRead(WIO_5S_RIGHT) == LOW && _index
+[0] < 3) {
           while (digitalRead(WIO_5S_RIGHT) == LOW);
           _index[0] += 1;
           drawEmptyBoxes(0, _index[0], inactiveBG, activeBG);
@@ -993,7 +995,7 @@ void loop() {
         GraphState = false;
 
         Tlight = light();
-        Tmotor = analogRead(ROTARY);//map(analogRead(ROTARY), 0, 1023, 21, 140);
+        Tmotor = map(analogRead(ROTARY), 0, 1023, 21, 140);
         tft.fillRect(5, 60, 235, 175, dashboardBG);
         drawDashboard();
         drawDashboardItemsTrain(Tlight, Tmotor);
@@ -1118,7 +1120,7 @@ void loop() {
                     loadTrain();
                     Serial1.print("\x03");
                     resetSM();
-                    training = "data=[(30,300),(75,100)]\r\n";
+                    training = "training=[(50,900),(500,600)]\r\n";
                     delay(500);
                     scanSMData();
                     breakcase = true;
@@ -1172,7 +1174,7 @@ void loop() {
                 _index[1] = 3;
                 GraphState = false;
                 Tlight = light();
-                Tmotor = analogRead(ROTARY);//map(analogRead(ROTARY), 0, 1023, 21, 140);
+                Tmotor = map(analogRead(ROTARY), 0, 1023, 21, 140);
                 tft.fillRect(5, 60, 235, 175, dashboardBG);
                 drawDashboard();
                 drawDashboardItemsTrain(Tlight, Tmotor);
@@ -1215,7 +1217,7 @@ void loop() {
           }
 
           Tmotor = analogRead(ROTARY);
-          
+
 
           if (abs(Tmotor - oldSpeed2Send) > 3) {
             itoa(Tmotor, Speed, 10);

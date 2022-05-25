@@ -10,7 +10,7 @@ LIS3DHTR<TwoWire> lis;
 #include<arduino.h>
 
 #define LCD_BACKLIGHT (72Ul) // Control Pin of LCD
-Servo myservo1;
+//Servo myservo1;
 Servo myservo2;
 
 
@@ -142,7 +142,7 @@ void setup() {
   tft.fillScreen(green);
 
   myservo2.attach(SDA); //for m5stack servos
-  myservo1.attach(SCL); //for Grove Servos
+  //myservo1.attach(SCL); //for Grove Servos
   //pinMode(SPEAKER, OUTPUT);  //Speaker
 
   pinMode(WIO_5S_UP, INPUT);
@@ -436,7 +436,7 @@ void reset_wio() { //resets all the training data to 0
   DCount = 0;
   state = "train";
   state_flag = true;
-  myservo1.write(90);
+  //myservo1.write(90);
   myservo2.write(90);
   pos = 90;
   i = 0;
@@ -473,7 +473,7 @@ void moveMotor() {
     while (digitalRead(WIO_5S_LEFT) == LOW) {
       count = count + 1;
       pos = pos - inc ;
-      myservo1.write(pos);
+      //myservo1.write(pos);
       myservo2.write(pos);
       //Play(pos,30);
 
@@ -492,7 +492,7 @@ void moveMotor() {
     while (digitalRead(WIO_5S_RIGHT) == LOW) {
       count = count + 1;
       pos = pos + inc ;
-      myservo1.write(pos);
+      //myservo1.write(pos);
       myservo2.write(pos);
       //Play(pos,30);
 
@@ -702,7 +702,7 @@ int smartMotor(int choiceSensor) {
 
         }
 
-        myservo1.write(pos);
+        //myservo1.write(pos);
         myservo2.write(pos);
         delay(100);
       }
