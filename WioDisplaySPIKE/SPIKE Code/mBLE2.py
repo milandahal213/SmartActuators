@@ -14,6 +14,10 @@ import json
 
 #function to read all the ports and their types
 
+msg=""
+
+#if msg is blank it will send port information otherwise it will send out whatever it is asked to send. 
+#to send custom info just replace msg to whatever value you want
 def getStat():
     a=hub.port.A.info()["type"]
     b=hub.port.B.info()["type"]
@@ -23,8 +27,13 @@ def getStat():
     f=hub.port.F.info()["type"]
     portStat=hub.status()["port"]
 
-    state={"A":{"t":a,"d":portStat["A"]},"B":{"t":b,"d":portStat["B"]},"C":{"t":c,"d":portStat["C"]},"D":{"t":d,"d":portStat["D"]},"E":{"t":e,"d":portStat["E"]},"F":{"t":f,"d":portStat["F"]}}
+    if not msg:
+        state={"m":1,"A":{"t":a,"d":portStat["A"]},"B":{"t":b,"d":portStat["B"]},"C":{"t":c,"d":portStat["C"]},"D":{"t":d,"d":portStat["D"]},"E":{"t":e,"d":portStat["E"]},"F":{"t":f,"d":portStat["F"]}}
+    else:
+        state={"m":2,"data":msg};
     return state
+
+
 
 
 _CONNECT_IMAGES = [
@@ -88,13 +97,10 @@ _UART_RX = (
     bluetooth.UUID("6E400003-B5A3-F393-E0A9-E50E24DCCA9E"),
     _FLAG_WRITE | _FLAG_WRITE_NO_RESPONSE,
 )
-_UART_MD = (
-    bluetooth.UUID("12345678-B5A3-F393-E0A9-E50E24DCCA9E"),
-    _FLAG_READ | _FLAG_NOTIFY,
-)
+
 _UART_SERVICE = (
     _UART_UUID,
-    (_UART_TX, _UART_MD, _UART_RX),
+    (_UART_TX, _UART_RX),
 )
 
 
@@ -167,7 +173,7 @@ class BLESimplePeripheral:
         self._ble = ble
         self._ble.active(True)
         self._ble.irq(self._irq)
-        ((self._handle_tx,self._handle_md, self._handle_rx),) = self._ble.gatts_register_services((_UART_SERVICE,))
+        ((self._handle_tx, self._handle_rx),) = self._ble.gatts_register_services((_UART_SERVICE,))
         self._connections = set()
         self._connected=False
         self._write_callback = None
@@ -183,9 +189,8 @@ class BLESimplePeripheral:
             self._connected=True
             self._update_animation()
             sleep_ms(2000)
-            self.sendData(repr(self._logo))
+            self.send(repr(self._logo))
             t = Timer(mode=Timer.PERIODIC, period=500, callback=lambda x:self.send(json.dumps(getStat())))
-            t = Timer(mode=Timer.ONE_SHOT, period=500, callback=lambda x:self.sendData("data"))
 
         elif event == _IRQ_CENTRAL_DISCONNECT:
             conn_handle, _, _ = data
@@ -203,11 +208,6 @@ class BLESimplePeripheral:
     def send(self, data):
         for conn_handle in self._connections:
             self._ble.gatts_notify(conn_handle, self._handle_tx, data)
-
-    def sendData(self, data):
-        _data={"data":data};
-        for conn_handle in self._connections:
-            self._ble.gatts_notify(conn_handle, self._handle_md, json.dumps(_data))
 
     def is_connected(self):
         return len(self._connections) > 0
@@ -227,9 +227,5 @@ class BLESimplePeripheral:
 
 # ===== End of library ===== #
 
-# Imports for program
-from hub import port, sound
-from time import sleep_ms
-time.sleep_ms(2000)
 # Intialize
 receiver = BLESimplePeripheral(logo="00000:09990:09990:09990:00000") 

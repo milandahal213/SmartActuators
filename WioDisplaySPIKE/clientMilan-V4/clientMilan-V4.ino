@@ -33,11 +33,18 @@ static BLEAdvertisedDevice* myDevice;
 char *rName = "robot"; //name of the SPIKE we want to connect to ... have to name all the SPIKEs robot
 char *dataStream; //port information from SPIKE
 char *dataGeneral; //general data from SPIKE
+int screenValue = 2;
+int num=5;
+
+
+char buf[12]; // "-2147483648\0"
+
 
 
 //SPIRTE data
 int x = 320;
 float scrollSpeed = 1;
+
 //SPIKE port data
 
 String dat;
@@ -50,6 +57,7 @@ int oldmenuState = 0;
 
 bool wasOne = false;
 bool wasTwo = false;
+
 //63- Force
 //65 - Small Motor
 //62 - Distance
@@ -57,9 +65,9 @@ bool wasTwo = false;
 //48 - Medium Motor
 
 
-int types[6];
-uint8_t portNames[6][2] = {{10, 10}, {250, 10}, {10, 70}, {250, 70}, {10, 130}, {250, 130}};
-int recData[6][6];
+int types[6]; //to store types of sensors or Motors in ports
+uint8_t portNames[6][2] = {{10, 10}, {250, 10}, {10, 70}, {250, 70}, {10, 130}, {250, 130}}; //location on wio screen for ports A to F
+int recData[6][6]; //place to store port values
 
 /*************************************/
 /*************************************/
@@ -71,21 +79,21 @@ void scanBLE() {
   menuState = 0;
   state = "scan";
   if (connected) {
-    Serial.println("I don't know if this thing is connected");
     BLEDevice::deinit();
   }
 }
 
 void switchLEFT() {
-  Serial.println("Button LEFT ");
-  tft.fillScreen(TFT_BLUE);
-  screen = "Stream";
+    screenValue = screenValue - 1;
 }
 void switchRIGHT() {
-  Serial.println("Button RIGHT ");
-  tft.fillScreen(TFT_GREEN);
-  screen = "General";
-
+    screenValue = screenValue + 1;
+}
+void switchUP() {
+    num = num + 5;
+}
+void switchDOWN() {
+    num = num - 5;
 }
 void connectBLE() {
   Serial.println("Connect Button Pressed");
@@ -101,13 +109,10 @@ static void notifyCallback(
   uint8_t* pData,
   size_t length,
   bool isNotify) {
-  Serial.println("received");
   dataStream = (char*)pData; //converting uint8_t to char array
   dataStream[length] = '\0'; //adding end of string
   state = "data";
-  Serial.println(dataStream);
 }
-
 
 
 class MyClientCallback : public BLEClientCallbacks {
@@ -152,57 +157,49 @@ bool connectToServer() {
   Serial.println(RRemoteCharacteristic->getUUID().toString().c_str());
   Serial.println(" - Found our characteristic");
   // Read the value of the characteristic.
-
-  Serial.println("One done");
   if (RRemoteCharacteristic->canNotify()) {
     RRemoteCharacteristic->registerForNotify(notifyCallback);
   }
-
-
-  Serial.println("callback set");
   connected = true;
   return true;
 }
+char scrollText[250];
+void drawTerminal(char *s1="", char *s2="") {
+  tft.setTextColor(TFT_BLUE,TFT_BLUE);
+  tft.drawString( scrollText,50,220);
+  
+  scrollText[0]='\0';
+  strcpy(scrollText, s1);
+  strcat(scrollText, s2);
+  tft.setTextSize(1);
+  tft.setTextColor(TFT_WHITE,TFT_WHITE);
+  tft.drawString( scrollText,50,220);
 
-
+}
 
 //Scan for BLE servers and find the first one that advertises the service we are looking for.
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
     void onResult(BLEAdvertisedDevice advertisedDevice) {
+
       if (memcmp(advertisedDevice.getName().c_str(), rName, 5) == 0) { //if the name is SPIKE then add the address to address variable
         addr[count_address] = advertisedDevice.getAddress().toString().c_str();
-        _RSSIvalue[count_address] = advertisedDevice.getRSSI();
-        Serial.println(addr[count_address]);
-        Serial.println(advertisedDevice.getRSSI());
+        _RSSIvalue[count_address] = advertisedDevice.getRSSI(); //save all the RSSI values with name robot
+         drawTerminal(itoa(count_address, buf, 10),"devices found");
         count_address += 1;
       }
-
     }
 };
-
-
-
-
 
 //create a function here that then connects to the selected address and connect
 class toConnectMyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
     void onResult(BLEAdvertisedDevice advertisedDevice) {
-      Serial.print("Trying to connect ");
-      //Serial.println(advertisedDevice.toString().c_str());
-      //Serial.println(advertisedDevice.getName().c_str());
-      Serial.println(advertisedDevice.getRSSI());
-      Serial.println("*******");
-      Serial.println(addr[0].c_str());
       //Serial.println(advertisedDevice.getAddress().toString().c_str());
-      //Serial.println("*****");
-
       if (strcmp(advertisedDevice.getAddress().toString().c_str() , addr[0].c_str()) == 0) {
-        //Serial.print("BATT Device found: ");
-        //Serial.println(advertisedDevice.toString().c_str());
+        drawTerminal("SPIKE Prime found");
+        Serial.print("BATT Device found: ");
+        Serial.println(advertisedDevice.toString().c_str());
         BLEDevice::getScan()->stop();
-        Serial.println("new BLEAdvertisedDevice");
         myDevice = new BLEAdvertisedDevice(advertisedDevice);
-        Serial.println("new BLEAdvertisedDevice done");
         doConnect = true;
         doScan = true;
       } // onResult
@@ -211,7 +208,6 @@ class toConnectMyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks 
 
 
 void sortRSSI() {
-  Serial.println("to be sorted");
   for (int i = 0; i < 9; i++)
   {
     if (abs(_RSSIvalue[0]) > abs(_RSSIvalue[i + 1]) && _RSSIvalue[i + 1]) {
@@ -222,31 +218,26 @@ void sortRSSI() {
 }
 
 void scanSPIKE() {
-
+  drawTerminal("Scanning SPIKE PRIMEs nearby ... ");
   delay(1000);
-  Serial.println("Starting Arduino BLE Client application...");
   BLEDevice::deinit();
-  Serial.println("Deinited and now initing");
   BLEDevice::init("");
-  Serial.println("Inited");
+  drawTerminal("BLE initialized");
   BLEScan* pBLEScan = BLEDevice::getScan();
-  Serial.println("Scanning");
   pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
-  Serial.println("Callbacks set");
   pBLEScan->setInterval(1349);
-  Serial.println("Interval set");
   pBLEScan->setWindow(449);
-  Serial.println("Window set");
   pBLEScan->setActiveScan(true);
-  Serial.println("active scan true");
-  pBLEScan->start(5, false);
+  pBLEScan->start(2, false);
+  
+
 
 }
 
 
 void connectSPIKE() {
 
-  Serial.println("Starting Arduino BLE Client application...");
+  //drawTerminal("Starting connection with ", addr[0].toCharArray(buf,10));
   BLEDevice::init("");
   BLEScan* pBLEScan = BLEDevice::getScan();
   pBLEScan->setAdvertisedDeviceCallbacks(new toConnectMyAdvertisedDeviceCallbacks());
@@ -326,8 +317,12 @@ void MOTOR(uint8_t *port , int value) {
   img.deleteSprite();
 }
 
-
-int color[11] = {TFT_BLACK, TFT_BLACK, TFT_BLACK, TFT_BLACK, TFT_BLUE, TFT_GREEN, TFT_BLACK, TFT_YELLOW, TFT_BLACK, TFT_RED, TFT_WHITE};
+//0 Black
+//9 RED
+//7 Yellow
+//5 green
+//4 cyan/blue
+int color[11] = {TFT_BLACK, TFT_BLACK, TFT_BLACK, TFT_BLACK, TFT_BLUE, TFT_GREEN, TFT_BLACK, TFT_YELLOW, TFT_BLACK, TFT_RED, TFT_WHITE}; //
 void COLOR(uint8_t *port , int value) {
   img.createSprite(50, 50);
   img.fillSprite(TFT_WHITE);
@@ -337,11 +332,7 @@ void COLOR(uint8_t *port , int value) {
   img.drawCircle(25, 15, 5, TFT_BLACK);
   img.fillCircle(25, 15, 3, color[value]);
   build_banner(String(value));
-  //0 Black
-  //9 RED
-  //7 Yellow
-  //5 green
-  //4 cyan/blue
+
   img.pushSprite(port[0], port[1]);
   img.deleteSprite();
 }
@@ -356,7 +347,6 @@ void DISTANCE(uint8_t *port , int value) {
   img.fillCircle(16, 16, 2, TFT_BLACK);
   img.drawCircle(34, 16, 3, TFT_WHITE);
   img.fillCircle(34, 16, 2, TFT_BLACK);
-
 
   build_banner(String(value));
   img.pushSprite(port[0], port[1]);
@@ -436,6 +426,176 @@ void GRAPH(int light, int motor) {
 }
 
 
+/**************************/
+///GRAPH SPRITES//
+/**************************/
+
+
+void GRAPH1() {
+
+  JSONVar myObject = JSON.parse(dataStream);
+  img.createSprite(250, 200);
+  img.fillSprite(TFT_WHITE);
+  int x, y;
+   //Serial.println(myObject);
+
+  for (int i = 0; i < myObject["data"]["training"].length(); i++) {
+    x = map(myObject["data"]["training"][i][0], -180, 180, 60, 240);
+    y = map(myObject["data"]["training"][i][1], 0, 1024, 25, 195);
+    img.fillCircle(x, 200 - y, 4, TFT_BLUE);
+  }
+
+  x = map(myObject["data"]["data"][0], -180, 180, 60, 180);
+  y = map(myObject["data"]["data"][1], 0, 1024, 25, 195);
+
+  img.fillCircle(x,  200 - y, 10, TFT_RED);
+  img.pushSprite(50, 50);
+  img.deleteSprite();
+ // Serial.println("done and dusted too");
+}
+
+
+void GRAPH2() {
+  int SWidth = 200;
+  int SHeight = 200;
+  float scale = SWidth/num;
+  JSONVar myObject = JSON.parse(dataStream);
+  img.createSprite(200, 200);
+  img.fillSprite(TFT_WHITE);
+  int x, y;
+  for (int i = 0; i < num; i++) {
+    img.drawFastHLine(0, scale * i, SWidth , TFT_GREEN); //Horizontal line
+    img.drawFastVLine(scale * i, 0, SHeight, TFT_GREEN); //Verical line
+  }
+  if (myObject["data"]["training"].length() > 0) {
+    for (int i = 0; i < myObject["data"]["training"].length(); i++) {
+
+      x = map(myObject["data"]["training"][i][0], -180, 180, 0, num);
+      y = map(myObject["data"]["training"][i][1], 0, 1024, 0, num);
+      img.fillRect(x * scale, y * scale, scale, scale, TFT_BLUE);
+     // Serial.println(x,y);
+    }
+  }
+  x = map(myObject["data"]["data"][0], -180, 180, 0, num);
+  y = map(myObject["data"]["data"][1], 0, 1024, 0, num);
+//  Serial.println(x,y);
+  img.drawRect(x * scale, y * scale, scale, scale, TFT_RED);
+  img.pushSprite(60, 10);
+  img.deleteSprite();
+ // Serial.println("done and dusted");
+}
+
+
+void GRAPH3() {
+  int SWidth = 200;
+  int SHeight = 200;
+  float scale = SWidth/num;
+  JSONVar myObject = JSON.parse(dataStream);
+  img.createSprite(200, 200);
+  img.fillSprite(TFT_WHITE);
+  int x, y;
+  for (int i = 0; i < num; i++) {
+    img.drawFastHLine(0, scale * i, SWidth , TFT_GREEN); //Horizontal line
+    img.drawFastVLine(scale * i, 0, SHeight, TFT_GREEN); //Verical line
+  }
+  if (myObject["data"]["training"].length() > 0) {
+    for (int i = 0; i < myObject["data"]["training"].length(); i++) {
+
+      x = map(myObject["data"]["training"][i][0], -180, 180, 0, num);
+      y = map(myObject["data"]["training"][i][1], 0, 1024, 0, num);
+      img.fillRect(x * scale, y * scale, scale, scale, TFT_BLUE);
+      img.drawFastHLine(0, scale * y +scale/2, SWidth , TFT_BLUE); //Horizontal line
+      img.drawFastVLine(scale * x+scale/2 , 0, SHeight, TFT_BLUE); //Verical line
+    }
+  }
+  x = map(myObject["data"]["data"][0], -180, 180, 0, num);
+  y = map(myObject["data"]["data"][1], 0, 1024, 0, num);
+//  Serial.println(x,y);
+  img.drawRect(x * scale, y * scale, scale, scale, TFT_RED);
+  img.pushSprite(60, 10);
+  img.deleteSprite();
+ // Serial.println("done and dusted");
+}
+
+void GRAPH4() {
+  int SWidth = 200;
+  int SHeight = 200;
+  float scale = SWidth/num;
+  JSONVar myObject = JSON.parse(dataStream);
+  img.createSprite(200, 200);
+  img.fillSprite(TFT_WHITE);
+  int x, y;
+  for (int i = 0; i < num; i++) {
+    img.drawFastHLine(0, scale * i, SWidth , TFT_GREEN); //Horizontal line
+    img.drawFastVLine(scale * i, 0, SHeight, TFT_GREEN); //Verical line
+  }
+  if (myObject["data"]["training"].length() > 0) {
+    for (int i = 0; i < myObject["data"]["training"].length(); i++) {
+
+      x = map(myObject["data"]["training"][i][0], -180, 180, 0, num);
+      y = map(myObject["data"]["training"][i][1], 0, 1024, 0, num);
+
+            img.fillRect(0, scale * y ,SWidth,scale , TFT_BLUE); //Horizontal rect
+      img.fillRect(scale * x , 0, scale, SHeight, TFT_BLUE); //Verical rect
+      img.fillRect(x * scale, y * scale, scale, scale, TFT_BLUE);
+
+    }
+  }
+  x = map(myObject["data"]["data"][0], -180, 180, 0, num);
+  y = map(myObject["data"]["data"][1], 0, 1024, 0, num);
+//  Serial.println(x,y);
+  img.drawRect(x * scale, y * scale, scale, scale, TFT_RED);
+  img.pushSprite(60, 10);
+  img.deleteSprite();
+ // Serial.println("done and dusted");
+}
+void GRAPH5() {
+
+  int SWidth = 200;
+  int SHeight = 200;
+  float scale = SWidth/num;
+  JSONVar myObject = JSON.parse(dataStream);
+  img.createSprite(200, 200);
+  img.fillSprite(TFT_WHITE);
+  int x, y;
+  for (int i = 0; i < num; i++) {
+    img.drawFastHLine(0, scale * i, SWidth , TFT_GREEN); //Horizontal line
+    img.drawFastVLine(scale * i, 0, SHeight, TFT_GREEN); //Verical line
+  }
+  if (myObject["data"]["training"].length() > 0) {
+    for (int i = 0; i < myObject["data"]["training"].length(); i++) {
+
+      x = map(myObject["data"]["training"][i][0], -180, 180, 0, num);
+      y = map(myObject["data"]["training"][i][1], 0, 1024, 0, num);
+
+            img.fillRect(0, scale * y ,SWidth,scale , TFT_LIGHTGREY); //Horizontal rect
+      img.fillRect(scale * x , 0, scale, SHeight, TFT_LIGHTGREY); //Verical rect
+      img.fillRect(x * scale, y * scale, scale, scale, TFT_BLUE);
+
+    }
+  }
+  x = map(myObject["data"]["data"][0], -180, 180, 0, num);
+  y = map(myObject["data"]["data"][1], 0, 1024, 0, num);
+//  Serial.println(x,y);
+  img.drawRect(x * scale, y * scale, scale, scale, TFT_RED);
+  img.pushSprite(60, 10);
+  img.deleteSprite();
+  Serial.println("number was");
+
+}
+void GRAPH6() {
+  Serial.println("to be added");
+}
+void GRAPH7() {
+  Serial.println("to be added");
+}
+void GRAPH8() {
+  Serial.println("to be added");
+}
+void GRAPH9() {
+  Serial.println("to be added");
+}
+
 void setup() {
   Serial.begin(115200);
   // while (!Serial) {};
@@ -464,6 +624,8 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(WIO_KEY_C),     scanBLE, FALLING);
   attachInterrupt(digitalPinToInterrupt(WIO_5S_LEFT),    switchLEFT, FALLING);
   attachInterrupt(digitalPinToInterrupt(WIO_5S_RIGHT),  switchRIGHT, FALLING);
+    attachInterrupt(digitalPinToInterrupt(WIO_5S_UP),    switchUP, FALLING);
+  attachInterrupt(digitalPinToInterrupt(WIO_5S_DOWN),  switchDOWN, FALLING);
   attachInterrupt(digitalPinToInterrupt(WIO_5S_PRESS), connectBLE, FALLING);
 
   delay(2000);
@@ -479,11 +641,12 @@ void decodeSPIKEdataStream() {
   if (int(myObject["m"]) == 1) {
     if (wasOne) {
     }
-    else{
+    else {
+      tft.fillScreen(TFT_BLUE);
       SPIKE(2); //draw SPIKE Sprite
       wasOne = true;
       wasTwo = false;
-      tft.fillScreen(TFT_BLUE);
+
     }
     types[0] = myObject["A"]["t"];
     types[1] = myObject["B"]["t"];
@@ -511,9 +674,19 @@ void decodeSPIKEdataStream() {
     for (int i = 0; i < myObject["F"]["d"].length(); i++) {
       recData[5][i] = myObject["F"]["d"][i];
     }
+/*
+ *
+MOTOR_MEDIUM = 48
+MOTOR_LARGE = 49
+COLOR_SENSOR = 61
+ULTRASOUND_SENSOR = 62
+TOUCH_SENSOR = 63
+TILT_SENSOR = 34 
+ */
+ 
 
     for (int i = 0; i < 6; i++) {
-      if (types[i] == 48 || types[i] == 65) {
+      if (types[i] == 48 ||types[i] == 49 || types[i] == 65) {
         MOTOR(portNames[i], recData[i][1]);
       }
       else if (types[i] == 61) {
@@ -534,25 +707,37 @@ void decodeSPIKEdataStream() {
     if (wasTwo) {
     }
     else {
+     tft.fillScreen(TFT_YELLOW);
+     Serial.println("forbidden but yet you go????");
       //draw GRAPH sprite Sprite
       wasOne = false;
       wasTwo = true;
-      tft.fillScreen(TFT_GREEN);
+
     }
     //data format
     // {"m": 2, "data": {"data": [1024, 107], "training": [[3, 104], [3, 104], [-112, 107], [104, 121], [107, 1024]]}}
-    GRAPH(int(myObject["data"]["data"][0]),int( myObject["data"]["data"][1]));
-    
-    Serial.println("new data coming");
+
+
+    if (screenValue == 1) {
+      GRAPH1();
+    }
+    else if (screenValue == 2) {
+      GRAPH2();
+    }
+    else if (screenValue == 3) {
+      GRAPH3();
+    }
+    else if (screenValue == 4) {
+      GRAPH4();
+    }
+    else if (screenValue == 5) {
+      GRAPH5();
+    }
   }
 }
 
 
 void loop() {
-  Serial.println(state);
-  Serial.println(screen);
-  Serial.println(connected);
-
   if (state == "connect" && not connected ) {
     //if the central button is pressed , connect the selected robot
     //scan all the BLE devices with name robot
@@ -560,7 +745,6 @@ void loop() {
     //connect to the SPIKE with the largest RSSI
     scrollSpeed = 100;
     hideMessage(180);
-
     showMessage("Connecting ", 50, 50);
     scanSPIKE();
     sortRSSI();
@@ -577,11 +761,11 @@ void loop() {
       doConnect = false;
     }
     state = "";
+    hideMessage(50);
   }
 
   else if (state == "data" &&  connected) {
     state = "";
-    Serial.println("calling");
     decodeSPIKEdataStream();
   }
 
@@ -594,7 +778,7 @@ void loop() {
     }
   }
 
-
+  Serial.println(screenValue);
   Serial.printf(".");
   delay(scrollSpeed);
 } // End of loop
