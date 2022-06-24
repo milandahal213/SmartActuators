@@ -10,7 +10,7 @@ LIS3DHTR<TwoWire> lis;
 #include<arduino.h>
 
 #define LCD_BACKLIGHT (72Ul) // Control Pin of LCD
-//Servo myservo1;
+
 Servo myservo2;
 
 
@@ -140,9 +140,10 @@ void setup() {
   lis.setOutputDataRate(LIS3DHTR_DATARATE_25HZ); //Data output rate
   lis.setFullScaleRange(LIS3DHTR_RANGE_2G); //Scale range set to 2g
   tft.fillScreen(green);
-  //myservo2.attach(SDA); //for m5stack servos
-  myservo2.attach(SCL); //for Grove Servos
-  //pinMode(SPEAKER, OUTPUT);  //Speaker
+
+  myservo2.attach(SDA); //for m5stack servos
+  //myservo2.attach(SCL); //for Grove Servos
+
 
   pinMode(WIO_5S_UP, INPUT);
   pinMode(WIO_5S_DOWN, INPUT);
@@ -360,14 +361,23 @@ void wiodisplay() {
 
     tft.fillRect(-20, -10, 50, 45, (buttonBG));
     tft.fillRect(65, -10, 50, 45, (buttonBG));
-
-
-    tft.drawXBitmap(4, 3, QUIT, 32, 30, TFT_RED);
+    tft.fillRect(150, -10, 50, 45, (buttonBG));
     tft.setTextColor(TFT_WHITE, TFT_WHITE);
     tft.setTextSize(2);
+
+    tft.drawXBitmap(4, 3, QUIT, 32, 30, TFT_RED);
     tft.drawString("f(x)", midButton - tft.textWidth("f(x)") / 2, 8);
+    tft.drawXBitmap(159, 3, EDIT, 32, 30, TFT_YELLOW);
     tft.setTextSize(1);
     tft.drawString(" Running Mode", 220, 5 );
+
+    if (DCount == 0) {
+      tft.drawString("Edit to take some data", 145, 38 );
+    }
+    else if (DCount == 1) {
+      tft.drawString(" !!! Edit to take more data", 145, 38 );
+    }
+
 
   }
   else if (state == "train") {
@@ -501,10 +511,9 @@ void reset_wio() { //resets all the training data to 0
   DCount = 0;
   state = "train";
 
-
   pos = 4;
-        motorPos = map(pos, 0, 8, 0, 180);
-      myservo2.write(motorPos);
+  motorPos = map(pos, 0, 8, 0, 180);
+  myservo2.write(motorPos);
   i = 0;
 
   sx = 0; //sum of x
@@ -567,7 +576,7 @@ void getSensor() {
 
   }
   sensorValue = map(sensorValue, 0, 160, 0, 8);
-   old_sensorValue = sensorValue;
+  old_sensorValue = sensorValue;
 }
 
 
@@ -607,7 +616,62 @@ int smartMotor(int choiceSensor) {
     if (digitalRead(WIO_KEY_B) == LOW) { //Delete data
       deleteData();
     }
-    
+
+
+    if (digitalRead(WIO_KEY_A) == LOW) { // go to run
+      state = "run";
+      buzz(3);
+      old_pos = -99;
+      m = float((DCount * sxy - sx * sy)) / float((DCount * sxsq - sx * sx)); // calculate the slope
+      b = float((sy - m * sx)) / float(DCount);              //calculate the intercept
+      displayTraining();
+      Serial.println(b);
+      Serial.println(m);
+      wiodisplay();
+      while (digitalRead(WIO_KEY_C)) { //pressing the button will escape the run mode
+        drawGraph();
+
+        if (digitalRead(WIO_KEY_B) == LOW) { // change the type of model
+          while (digitalRead(WIO_KEY_B) == LOW) ;
+          trainSelectorpage();
+          wiodisplay();
+        }
+
+        if (digitalRead(WIO_KEY_A) == LOW) { // change the type of model
+          while (digitalRead(WIO_KEY_A) == LOW) ;
+          state = "train";
+          wiodisplay();
+          break;
+        }
+
+
+
+        getSensor();
+        if (choiceModel == 1) {
+          mini = 1000;
+          pos = 4;
+          for (int i = 0; i < DCount; i++) {
+            dist = abs(sensorValue - training[i][1]);
+            if (dist < mini) {
+              mini = dist;
+              pos = training[i][0];
+            }
+          }
+        }
+
+        else if (choiceModel == 2) {
+          tft.drawLine(75 + float(-b) / float(m) , 220, 75 + float((150 - b)) / float(m), 70, TFT_GREEN);
+          pos = float(sensorValue - b) / float(m );
+        }
+
+        displayTraining();
+        motorPos = map(pos, 0, 8, 0, 180);
+        myservo2.write(motorPos);
+        old_pos = pos;
+        delay(100);
+      }
+    }
+
     if (digitalRead(WIO_5S_PRESS) == LOW) { //store data
       //for linear regression
       sx = sx + pos;
@@ -623,53 +687,6 @@ int smartMotor(int choiceSensor) {
       DCount += 1;
     }
 
-    if (digitalRead(WIO_KEY_A) == LOW) { // go to run
-      state = "run";
-      wiodisplay();
-      buzz(3);
-      old_pos = -99;
-      m = float((DCount * sxy - sx * sy)) / float((DCount * sxsq - sx * sx)); // calculate the slope
-      b = float((sy - m * sx)) / float(DCount);              //calculate the intercept
-      displayTraining();
-      Serial.println(b);
-      Serial.println(m);
-
-      while (digitalRead(WIO_KEY_C)) { //pressing the button will escape the run mode
-        drawGraph();
-        
-        if (digitalRead(WIO_KEY_B) == LOW) { // change the type of model
-          while (digitalRead(WIO_KEY_B) == LOW) ;
-          trainSelectorpage();
-          wiodisplay();
-        }
-
-
-        
-        getSensor();
-        if (choiceModel == 1) {
-          mini = 1000;
-          pos = 4;
-          for (int i = 0; i < DCount; i++) {
-            dist = abs(sensorValue - training[i][1]);
-            if (dist < mini) {
-              mini = dist;
-              pos = training[i][0];
-            }
-          }
-        }
-        
-        else if (choiceModel == 2) {
-          tft.drawLine(75 + float(-b) / float(m) , 220, 75 + float((150 - b)) / float(m), 70, TFT_GREEN);
-          pos = float(sensorValue - b) / float(m );
-        }
-        
-        displayTraining();
-        motorPos = map(pos, 0, 8, 0, 180);
-        myservo2.write(motorPos);
-        old_pos = pos;
-        delay(100);
-      }
-    }
   }
   reset_wio();
 
