@@ -532,15 +532,15 @@ void drawTrainingGraph(int DC) {
   tft.drawString("Sensor Intensity", 50, 10 );
   tft.setRotation(3);
   for (int i = 0; i < DC; i++) {
-    tft.fillCircle(35 + map(trainingData[i][0],0,1023,0,180), 215 - mapLightdata(float(trainingData[i][1])) , 5, TFT_BLUE);
+    tft.fillCircle(35 + map(trainingData[i][0], 0, 1023, 0, 180), 215 - mapLightdata(float(trainingData[i][1])) , 5, TFT_BLUE);
   }
 }
 
 
 int drawGraphItemsTrain(int light, int motor) {
 
-  tft.drawCircle(35 + map(oldx,0,1023,0,180), oldy, 5, dashboardBG);
-  tft.drawCircle(35 + map(motor,0,1023,0,180), 220 - mapLightdata(float(light)), 5, TFT_RED);
+  tft.drawCircle(35 + map(oldx, 0, 1023, 0, 180), oldy, 5, dashboardBG);
+  tft.drawCircle(35 + map(motor, 0, 1023, 0, 180), 220 - mapLightdata(float(light)), 5, TFT_RED);
   oldx = motor ;
   oldy = 220 - mapLightdata(float(light));
   return 1;
@@ -571,21 +571,21 @@ void drawGraph(int DC) {
   tft.drawString("Sensor Intensity", 50, 10 );
   tft.setRotation(3);
   for (int i = 0; i < DC; i++) {
-    tft.fillCircle(35 + map(tData[i][0],0,1023,0,180), 215 - mapLightdata(float(tData[i][1])) , 5, TFT_BLUE);
+    tft.fillCircle(35 + map(tData[i][0], 0, 1023, 0, 180), 215 - mapLightdata(float(tData[i][1])) , 5, TFT_BLUE);
   }
 }
 
 int drawGraphItems() {
   int t = scanSMData();
-  tft.drawCircle(35 + map(oldx,0,1023,0,180), oldy, 5, dashboardBG);
+  tft.drawCircle(35 + map(oldx, 0, 1023, 0, 180), oldy, 5, dashboardBG);
   if (t == 0) {
     return 0;
   }
   if (t == 1 && validConnection() == 1) {
-    tft.drawCircle(35 + map(atoi(Name[3]),0,1023,0,180), 220 - mapLightdata(float(atoi(Name[2]))), 5, TFT_RED);
+    tft.drawCircle(35 + map(atoi(Name[3]), 0, 1023, 0, 180), 220 - mapLightdata(float(atoi(Name[2]))), 5, TFT_RED);
 
   }
-  oldx =atoi(Name[3]);
+  oldx = atoi(Name[3]);
   oldy = 220 - mapLightdata( float(atoi(Name[2])));
   return 1;
 }
@@ -615,7 +615,7 @@ void drawDashboard() {
   tft.drawRoundRect(X, Y, widthRect1, heightRect1, 10, TFT_BLACK);
   tft.fillRoundRect(X + 30, Y + 5, widthRect2, heightRect2, 10, TFT_WHITE);
   tft.fillCircle(xc, yc, radius2, TFT_BLUE);
-  for (int dum = 0; dum < 360; dum = dum + 10) {
+  for (int dum = 0; dum < 182; dum = dum + 10) {
     tft.drawLine(xc, yc, xc - int(70 * cos(dum * PI / 180)), yc - int(70 * sin(dum * PI / 180)), TFT_GREEN);
   }
   tft.drawCircle(xc, yc, radius2, TFT_BLACK);
@@ -649,11 +649,14 @@ int drawDashboardItems() {
 
 
   if (t == 1 && validConnection() == 1) {
-    float angle=map(oldMotor,0,1023,0,179) * PI / 180;
+    float angle = PI - map(oldMotor, 0, 1023, 0, 179) * PI / 180;
     tft.drawLine(xc, yc, xc - int(50 * cos(angle)), yc - int(50 * sin(angle)), TFT_WHITE);
+    tft.fillCircle(xc - int(45 * cos(angle)), yc - int(45 * sin(angle)), 5, TFT_WHITE);
     tft.fillRect( xR, 215 - oldLight, widthLight, oldLight, TFT_WHITE);
-    angle=map(motor,0,1023,0,179) * PI / 180;
+    angle = PI - map(motor, 0, 1023, 0, 179) * PI / 180;
     tft.drawLine(xc, yc, xc - int(50 * cos( angle)), yc - int(50 * sin(angle)), TFT_BLACK);
+    tft.fillCircle(xc - int(45 * cos(angle)), yc - int(45 * sin(angle)), 5, TFT_RED);
+    tft.fillCircle(xc - int(45 * cos(angle)), yc - int(43 * sin(angle)), 1, TFT_WHITE);
     tft.fillRect(xR, 215 - light, widthLight, light, TFT_RED);
 
 
@@ -664,8 +667,8 @@ int drawDashboardItems() {
   return 1;
 }
 
-float mapLightdata(float sensorVal){
-  return(135 * sensorVal/1024);
+float mapLightdata(float sensorVal) {
+  return (135 * sensorVal / 1024);
 }
 
 //Dashboard for Training menu
@@ -679,11 +682,14 @@ int drawDashboardItemsTrain(int Clight, int motor) {
   int light = mapLightdata(float(Clight));
   //int t = scanSMData();
 
-  float angle=map(oldMotor,0,1023,0,179) * PI / 180;
+  float angle = PI - map(oldMotor, 0, 1023, 0, 179) * PI / 180;
   tft.fillRect( xR, 215 - oldLight, widthLight, oldLight, TFT_WHITE);
   tft.drawLine(xc, yc, xc - int(50 * cos(angle)), yc - int(50 * sin(angle)), TFT_WHITE);
-  angle=map(motor,0,1023,0,179) * PI / 180;
+  tft.fillCircle(xc - int(45 * cos(angle)), yc - int(45 * sin(angle)), 5, TFT_WHITE);
+  angle = PI - map(motor, 0, 1023, 0, 179) * PI / 180;
   tft.drawLine(xc, yc, xc - int(50 * cos(angle)), yc - int(50 * sin(angle)), TFT_BLACK);
+  tft.fillCircle(xc - int(45 * cos(angle)), yc - int(45 * sin(angle)), 5, TFT_RED);
+  tft.fillCircle(xc - int(45 * cos(angle)), yc - int(43 * sin(angle)), 1, TFT_WHITE);
   tft.fillRect(xR, 215 - light, widthLight, light, TFT_RED);
 
 
@@ -958,8 +964,7 @@ void loop() {
           _index[0] -= 1;
           drawEmptyBoxes(0, _index[0], inactiveBG, activeBG);
         }
-        if (digitalRead(WIO_5S_RIGHT) == LOW && _index
-[0] < 3) {
+        if (digitalRead(WIO_5S_RIGHT) == LOW && _index[0] < 3) {
           while (digitalRead(WIO_5S_RIGHT) == LOW);
           _index[0] += 1;
           drawEmptyBoxes(0, _index[0], inactiveBG, activeBG);
@@ -1459,13 +1464,13 @@ void loop() {
               tft.fillScreen(TFT_WHITE);
               tft.fillRect( 50, 120, 220, 80, TFT_GREEN);
               tft.setTextSize(2);
-              tft.drawString("UPDAING FIRMWARE", 160 - tft.textWidth("TUPDATING FIRMWARE") / 2, 150);
+              tft.drawString("UPDAING FIRMWARE", 160 - tft.textWidth("UPDATING FIRMWARE") / 2, 150);
               tft.setTextSize(1);
               tft.drawString("Please wait!!", 160 - tft.textWidth("Please wait!!") / 2, 180);
               Serial1.print("\x03");
               delay(1000);
               Serial.print(list[_index[5] - 1]);
-              wipeClean(list[_index[5] - 1], "Unnamed"); 
+              wipeClean(list[_index[5] - 1], "Unnamed");
               Serial1.print("\x03");
               resetSM();
               delay(500);
@@ -1553,8 +1558,10 @@ void loop() {
 
     else
     {
-      tft.fillScreen(TFT_RED);
-      tft.drawString("ERROR IN THE CONNECTION", 10, 70);
+      tft.fillScreen(TFT_BLUE);
+      tft.setTextColor(TFT_BLACK, TFT_BLACK);
+      tft.setTextSize(2);
+      tft.drawString("SMARTMOTOR NOT CONNECTED", 10, 70);
       strcpy(Name[0], "");
       strcpy(Name[1], "");
       strcpy(Name[2], "");
@@ -1571,7 +1578,8 @@ void loop() {
   else {
 
   }
-  tft.fillScreen(TFT_GREEN);
+  tft.fillScreen(TFT_BLUE);
+  tft.drawString("SMARTMOTOR NOT CONNECTED", 10, 70);
   strcpy(Name[0], "");
   strcpy(Name[1], "");
   strcpy(Name[2], "");

@@ -1,20 +1,5 @@
-# smart Motor code with 8266
-'''# Pins for PCB design
-# short D8 and D4 - no navigation switch on this prototype 
-| Pins | Numbers | Roles |
-| --- | --- | --- |
-| D0 | GPIO 16 | Switch Up |
-| D1 | GPIO 5 | OLED - SCL |
-| D2 | GPIO 4 | OLED - SDA |
-| D3 | GPIO 0 | Motor - Encoder 1 |
-| D4 | GPIO 2 | Switch Down |
-| D5 | GPIO 14 | Driver Phase |
-| D6 | GPIO 12 | Driver Enable |
-| D7 | GPIO 13 | Switch T |
-| D8 | GPIO 15 | Motor - Encoder 2 |
-| A0 |  | Sensor Port - Analog signal |
-| Rx |  | #potential sensor |
-| Tx |  | #potential sensor |
+# smart Motor code with PCIO
+'''
 
 Wiring method:
 black: motor power"-"
@@ -29,40 +14,36 @@ from machine import Pin, I2C, PWM , ADC
 import time
 import ssd1306
 
-D0=Pin(16) 
-D1=Pin(5)
-D2=Pin(4)
-D3=Pin(0)
-D4=Pin(2)
-D5=Pin(14)
-D6=Pin(12)
-D7=Pin(13)
-D8=Pin(15)
-
 training = True #state defines what mode the motor is running on 
 data=[]
   
 #setting the motor
 
-enable=PWM(D6) #D6 - PWM pin
+enable=PWM(Pin(15))
 enable.freq(500)
-enable.duty(00)
+enable.duty_u16(00)
 
-phase = machine.Pin(14, machine.Pin.OUT) # D5 direction
+phase = machine.Pin(14, machine.Pin.OUT)
+coast = machine.Pin(0, machine.Pin.OUT)
 
 #setting the sensor
 sensor=ADC(0)
 
 #setting buttons
-recBut=Pin(13,Pin.IN)
+recBut=Pin(1,Pin.IN)
 
 
 #setting the display 
-i2c = I2C(sda=Pin(4), scl=Pin(5))
-display = ssd1306.SSD1306_I2C(128, 64, i2c) #SCL - D1 SDA - D2
-display.text('Hello, World!', 0, 0, 1)
+i2c = machine.I2C(0, scl=machine.Pin(17), sda=machine.Pin(16)) #pico 
+display = ssd1306.SSD1306_I2C(128, 64, i2c)
+
+import framebuf
+fbuf = framebuf.FrameBuffer(bytearray(8 * 8 * 1), 8, 8, framebuf.MONO_VLSB)
+fbuf.line(0, 0, 7, 7, 1)
+display.blit(fbuf, 10, 10, 0)           # draw on top at x=10, y=10, key=0
 display.show()
 
+from machine import Pin, I2C, PWM , ADC
 class Count(object):
     def __init__(self,A,B):
         self.A = A
@@ -74,9 +55,12 @@ class Count(object):
     def cb(self,msg):
         other,inc = (self.B,1) if msg == self.A else (self.A,-1) #define other line and increment
         self.counter += -inc if msg.value()!=other.value() else  inc #XOR the two lines and increment
-        
     def value(self):
         return self.counter
+
+
+
+position = Count(Pin(2, Pin.IN),Pin(3, Pin.IN))
 
 #setting the inputs
 
@@ -89,33 +73,42 @@ def check_button(switch):
             return False
     return True
 
+def stopMotor():
+    enable.duty_u16(0)
+
+def enableCoasting():
+    coast.value(0)
+
+
+def disableCoasting():
+    coast.value(1)
+
 
 def moveMotor(pos):
-    while(abs(position.value()-pos)>100):
-        enable.duty(200)
+    disableCoasting()
+    while(abs(position.value()-pos)>50):
+        print("here")
+        enable.duty_u16(300000)
         if(position.value()>pos):
             phase.value(1)
         else:
             phase.value(0)
-        print(position.value())
         time.sleep(0.1)
     
-    enable.duty(0)
+    enable.duty_u16(0)
     position.value()
 
-
-position = Count(Pin(2, Pin.IN),Pin(0, Pin.IN))
-
-sensor.read()
+sensor.read_u16()
 
 time.ticks_ms()
 
 while True:
     #sensorData=sensor.read() 
+    enableCoasting()
     if (recBut.value()):
         training=check_button(recBut) 
         if(training): #Training mode
-            data.append([sensor.read(),position.value()])
+            data.append([sensor.read_u16(),position.value()])
             print("training")
             time.sleep(0.01)
 
@@ -130,12 +123,12 @@ while True:
                         pass
                     break
                 else:
-                    min=10000
+                    min=100000000
                     pos=0
                     for i in data:
-                        if(min>abs(sensor.read()-i[0])):
+                        if(min>abs(sensor.read_u16()-i[0])):
                             pos=i[1]
-                            min=abs(sensor.read()-i[0])
+                            min=abs(sensor.read_u16()-i[0])
                         print("inside",pos)
                     moveMotor(pos)
                     print("outside",pos)
@@ -151,6 +144,11 @@ while True:
 
 '''
 playgoround
+
+0.4 mHz 
+
+
+2350 rotation per second 
 
 from machine import Pin, ADC
 from time import sleep
