@@ -36,7 +36,7 @@ hub.button.left.callback(lambda time_ms:setButton(2,time_ms))    #    Run
 hub.button.center.callback(lambda time_ms:setButton(3,time_ms))    #    Quit
 hub.button.connect.callback(lambda time_ms:setButton(4,time_ms))    #    Delete one data
 
-buttonValue    =    0
+buttonValue   =    0
 buttonTime    =    0
 
 def setButton(but,t):
