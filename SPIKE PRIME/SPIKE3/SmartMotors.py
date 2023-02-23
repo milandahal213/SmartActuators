@@ -129,16 +129,13 @@ while not inputbutton(quitProgram)>1000: # it will quit if the centre button is 
    blinky=pos
    time.sleep(.1)
   playmusic(trainTone)
-
-
-'# boot.py -- run on boot to configure USB and filesystem\r\n# Put app code in main.py\r\n\r\nimport hub\r\nhub.config["hub_os_enable"] = False\r\n'
-
-'# boot.py -- run on boot to configure USB and filesystem\r\n# Put app code in main.py\r\n\r\nimport hub\r\nimport main\r\n'
-
-
+''' 
+Edit the boot.py file to 
 
   '# boot.py -- run on boot to configure USB and filesystem\r\n
   # Put app code in main.py
   \r\n\r\n
   import hub\r\n
-  hub.config["hub_os_enable"] = True\r\n'
+  hub.config["hub_os_enable"] = False\r\n'''
+
+
