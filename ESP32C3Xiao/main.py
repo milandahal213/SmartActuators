@@ -1,7 +1,3 @@
-from machine import Pin, SoftI2C , PWM , ADC
-import time
-import ssd1306
-import servo
 
 
 #setting display lines and varibales
@@ -9,15 +5,26 @@ import servo
 from machine import Pin, SoftI2C , PWM , ADC
 import time
 import ssd1306
+import servo
 i2c=SoftI2C(scl=Pin(7), sda=Pin(6))
 display = ssd1306.SSD1306_I2C(128, 64, i2c)
+
 display.text("Booting Up",40,0)
+display.show()
+time.sleep(3)
+display.text("Booting Up",40,0,0)
 display.show()
 
 oldmsg=""
+oldbatt=""
 oldsensor=""
 oldmotor=""
+oldx=0
+oldy=0
 
+#setting the battery reader
+batt=ADC(Pin(4))
+batt.atten(ADC.ATTN_11DB)
 
 #setting the sensor
 sensor=ADC(Pin(5))
@@ -40,12 +47,23 @@ data=[]
 #setting the functions
 
 
-def showState(msg):
+def showState(msg,x=10,y=0):
     global oldmsg
-    display.text(oldmsg,40,0,0)
-    display.text(msg, 40, 0, 1)
+    global oldx
+    global oldy
+    display.text(oldmsg,oldx,oldy,0)
+    display.text(msg, x, y, 1)
     display.show()
     oldmsg=msg
+    oldx=x
+    oldy=y
+
+def showBattery(msg):
+    global oldbatt
+    display.text(oldbatt,80,0,0)
+    display.text(msg, 80, 0, 1)
+    display.show()
+    oldbatt=msg
 
 def showData(sensor, motor):
     global oldsensor, oldmotor
@@ -94,6 +112,7 @@ def play():
 
 while True:
     #sensorData=sensor.read() 
+    showBattery(str(int(batt.read_u16()/65535 * 100)))
     showState("Training")
     sens=sensor.read_u16()
     pos=int(pot.read_u16()/65535 * 180)
