@@ -1,9 +1,13 @@
+import os
+os.chdir("program")
+os.mkdir("00")
+os.chdir("00")
+f=open("program.py","w")
 #LastEdit- Feb 24 2023
 #SmartMotor Code to be used on SPIKE3
 #Motor Port A
 #Sensor Port B
-
-
+a='''
 import hub
 import motor
 import port
@@ -143,4 +147,6 @@ while not inputbutton(quitProgram)>1000: # it will quit if the centre button is 
    blinkx=sensorValue
    blinky=pos
    time.sleep(.1)
-   
+ '''  
+f.write(a)
+f.close()
