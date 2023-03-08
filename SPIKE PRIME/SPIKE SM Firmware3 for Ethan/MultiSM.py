@@ -25,6 +25,7 @@ SMModes="" # SS, MS
 
 
 #defining tones/tunes for different actions
+startTone=[[740,100],[587,100],[440,100],[293,100],[740,100],[587,100],[440,100],[293,100]]
 saveTone=[[493,100],[220,100]]
 runTone=[[293,100],[440,100],[587,100],[740,100]]
 trainTone=[[740,100],[587,100],[440,100],[293,100]]
@@ -33,10 +34,9 @@ shutDown=[[740,100],[587,100],[440,100],[293,100],[740,100],[587,100],[440,100],
 #save button
 buttonPressed=button.button_pressed
 
-
 Run=button.BUTTON_RIGHT
 Data=button.BUTTON_LEFT
-Select=button.BUTTON_ON_OFF #to select mode/ Next pair
+#Select=button.BUTTON_ON_OFF #to select mode/ Next pair
 
 
 deleteData=button.BUTTON_CONNECT
@@ -67,7 +67,7 @@ def playmusic(music):
   time.sleep_ms(dur)
   sound.soundStop()
 
-playmusic(trainTone) #change this to mario
+
 
 class Connections:
 
@@ -153,17 +153,26 @@ class SmartMotors:
     self.data=[]
 
 
+  def drawImage(self):
+    self.temp = [0] * 25
+
+    Image=bytes(self.temp)
+    display.display_show_image(Image)
+
+
   def train(self):
-      while(not buttonPressed(Run)):
-        sensorValue=port.port_getSensor(self.sensors[0])[0]
-        motorValue=[]
-        for motorPort in self.motors: 
-          motorValue.append(motor.motor_get_position(motorPort))
-          if(buttonPressed(Data)):
-            while(buttonPressed(Data)):
-              pass #wait till the right button is released
-            self.data.append([sensorValue,motorValue])
-            time.sleep(0.1)
+
+    while(not buttonPressed(Run)):
+      sensorValue=port.port_getSensor(self.sensors[0])[0]
+      motorValue=[]
+      for motorPort in self.motors: 
+        motorValue.append(motor.motor_get_position(motorPort))
+        if(buttonPressed(Data)):
+          playmusic(saveTone)
+          while(buttonPressed(Data)):
+            pass #wait till the right button is released
+          self.data.append([sensorValue,motorValue])
+          time.sleep(0.1)
 
 
 
@@ -185,45 +194,49 @@ class SmartMotors:
     return(self.data)
 
 
-s=Connections()
+def main():
+  rgb.rgb_setColor(0,3) #set the blue to indicate stat
+  playmusic(startTone) #change this to mario
+  s=Connections()
+  while(not buttonPressed(Select)):
+    s.ShowAllConnections()
+    time.sleep(1)
+   
+  
+  playmusic(trainTone)
+  state="TRAIN"
+  pairs= s.makepairs()
+
+  rgb.rgb_setColor(0,6) # GREEN color for trining is done
+
+  #change the color of LED 
+  
+  #scroll start training on the screen
+  SM=[] # that is max number of SmartMotors pairs that can be made
+  for index,pair in enumerate(pairs):
+    try:
+      sensorPort,motorPort=pair
+      SM.append(SmartMotors(sensorPort,motorPort))
+    except:
+      pass
+      #display error
 
 
-while(not buttonPressed(Select)):
-  s.ShowAllConnections()
-  time.sleep(1)
- 
-state="TRAIN"
-playmusic(trainTone)
-pairs= s.makepairs()
-
-
-#change the color of LED 
-#scroll start training on the screen
-SM=[] # that is max number of SmartMotors pairs that can be made
-for index,pair in enumerate(pairs):
-  try:
-    sensorPort,motorPort=pair
-    SM.append(SmartMotors(sensorPort,motorPort))
-  except:
-    pass
-    #display error
-
-
-for smartmotor in SM:
-  try:
-    smartmotor.train()
-    playmusic(trainTone)
-  except:
-    pass
-    #dislay error
-
-
-state="RUN"
-playmusic(runTone)
-
-while(not buttonPressed(Select)):
   for smartmotor in SM:
-    smartmotor.play()
-    time.sleep(0.1)
+    try:
+      smartmotor.train()
+      playmusic(trainTone)
+    except:
+      pass
+      #dislay error
+
+
+  state="RUN"
+  playmusic(runTone)
+
+  while(not buttonPressed(Data)):
+    for smartmotor in SM:
+      smartmotor.play()
+      time.sleep(0.1)
  
 
