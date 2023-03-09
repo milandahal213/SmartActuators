@@ -235,7 +235,7 @@ def main():
   state="TRAIN"
   pairs= s.makepairs()
 
-  rgb.rgb_setColor(0,9) # GREEN color for Playing Mode
+  rgb.rgb_setColor(0,2) # PURPLE color for Training Mode
 
   #change the color of LED 
   
