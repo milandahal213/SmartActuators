@@ -1,9 +1,21 @@
+import os
+os.chdir("program")
+
+if os.listdir().count("00"):
+    os.chdir("00")
+else:
+    os.mkdir("00")
+    os.chdir("00")
+
+f=open("program.py","w")
+a='''
 #SmartMotors code 
-#Last Edited : March 7, 2023 
+#Last Edited : March 9, 2023 
 #Code by Milan Dahal
 #Sensors to the left of the hub
 #Motors to the right of the hub
 # you can choose your SM sensor motor pair - supports multiple SM pairs in one hub
+
 import hub
 import motor
 import port
@@ -110,6 +122,7 @@ class Connections:
 
     Image=bytes(self.temp)
     display.display_show_image(Image)
+    return Image
 
   def drawLines(self): #draws multi lines for singgle sensor condition
     self.temp[(self.locationOfSensors[0])*5+0]=100
@@ -152,8 +165,23 @@ class SmartMotors:
     self.data=[]
 
 
-  def drawImage(self):
+  def drawImage(self, sens, mots):
     self.temp = [0] * 25
+
+    self.temp[(sens[0])*5+0]=100
+    self.temp[(sens[0])*5+1]=100
+    self.temp[(sens[0])*5+2]=100
+    for mot in mots:
+      self.temp[(mot-1)*5+2]=100
+      self.temp[(mot-1)*5+3]=100
+      self.temp[(mot-1)*5+4]=100
+
+    #drawing the vertical lines
+    minval=min(sens+mots)
+    maxval=max(sens+mots)
+
+    for i in range(minval,maxval): 
+      self.temp[i*5+2]=100 
 
     Image=bytes(self.temp)
     display.display_show_image(Image)
@@ -165,6 +193,7 @@ class SmartMotors:
       sensorValue=port.port_getSensor(self.sensors[0])[0]
       motorValue=[]
       for motorPort in self.motors: 
+        self.drawImage(self.sensors, self.motors)
         motorValue.append(motor.motor_get_position(motorPort))
         if(buttonPressed(Data)):
           playmusic(saveTone)
@@ -194,11 +223,11 @@ class SmartMotors:
 
 
 def main():
-  rgb.rgb_setColor(0,3) #set the blue to indicate stat
+  rgb.rgb_setColor(0,3) #set the blue to indicate start
   playmusic(startTone) #change this to mario
   s=Connections()
   while(not buttonPressed(Run)):
-    s.ShowAllConnections()
+    snapShotofConnection=s.ShowAllConnections()
     time.sleep(1)
    
   
@@ -206,7 +235,7 @@ def main():
   state="TRAIN"
   pairs= s.makepairs()
 
-  rgb.rgb_setColor(0,6) # GREEN color for trining is done
+  rgb.rgb_setColor(0,9) # GREEN color for Playing Mode
 
   #change the color of LED 
   
@@ -232,8 +261,9 @@ def main():
 
   state="RUN"
   playmusic(runTone)
-
+  rgb.rgb_setColor(0,6) # GREEN color for Playing Mode
   while(not buttonPressed(Data)):
+    display.display_show_image(snapShotofConnection)
     for smartmotor in SM:
       smartmotor.play()
       time.sleep(0.1)
@@ -241,3 +271,8 @@ def main():
 
 while(not buttonPressed(Run)):
   main()
+
+
+'''
+f.write(a)
+f.close()
