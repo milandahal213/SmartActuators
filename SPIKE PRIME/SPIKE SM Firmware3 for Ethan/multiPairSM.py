@@ -1,13 +1,3 @@
-import os
-os.chdir("program")
-
-if os.listdir().count("00"):
-    os.chdir("00")
-else:
-    os.mkdir("00")
-    os.chdir("00")
-
-
 #SmartMotors code 
 #Last Edited : March 7, 2023 
 #Code by Milan Dahal
@@ -165,21 +155,6 @@ class SmartMotors:
   def drawImage(self):
     self.temp = [0] * 25
 
-    self.temp[(self.sensors[0])*5+0]=100
-    self.temp[(self.sensors[0])*5+1]=100
-    self.temp[(self.sensors[0])*5+2]=100
-    for mot in mots:
-      self.temp[(self.motors-1)*5+2]=100
-      self.temp[(self.motors-1)*5+3]=100
-      self.temp[(self.motors-1)*5+4]=100
-
-    #drawing the vertical lines
-    minval=min(self.sensors+self.motors)
-    maxval=max(self.sensors+self.motors)
-
-    for i in range(minval,maxval): 
-      self.temp[i*5+2]=100 
-
     Image=bytes(self.temp)
     display.display_show_image(Image)
 
@@ -190,7 +165,6 @@ class SmartMotors:
       sensorValue=port.port_getSensor(self.sensors[0])[0]
       motorValue=[]
       for motorPort in self.motors: 
-        self.drawImage()
         motorValue.append(motor.motor_get_position(motorPort))
         if(buttonPressed(Data)):
           playmusic(saveTone)
@@ -198,11 +172,7 @@ class SmartMotors:
             pass #wait till the right button is released
           self.data.append([sensorValue,motorValue])
           time.sleep(0.1)
-    time.sleep(0.1)
-    while(buttonPressed(Run)):
-        print("button pressed")
-        time.sleep(0.4)
-        pass
+
 
 
   def play(self):
@@ -266,12 +236,8 @@ def main():
   while(not buttonPressed(Data)):
     for smartmotor in SM:
       smartmotor.play()
-      smartmotor.display()
       time.sleep(0.1)
  
 
 while(not buttonPressed(Run)):
-  main() 
-
-
-
+  main()
