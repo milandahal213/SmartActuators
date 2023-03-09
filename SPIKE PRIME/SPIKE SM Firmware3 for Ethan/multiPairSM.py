@@ -1,11 +1,21 @@
 import os
+# get back to root
+if (not os.getcwd() == '/flash'):
+    os.chdir('/flash')
+# switch to program files
 os.chdir("program")
-
+# check if slot '00'
 if os.listdir().count("00"):
     os.chdir("00")
 else:
+    # no slot '00' so make it
     os.mkdir("00")
     os.chdir("00")
+# delete any previous programs stored in slot
+program_names = ['program.mpy', 'program.py']
+for program in program_names:
+    if (program in os.listdir()):
+        os.remove(program) # if found, remove
 
 f=open("program.py","w")
 a='''
@@ -276,3 +286,4 @@ while(not buttonPressed(Run)):
 '''
 f.write(a)
 f.close()
+os.chdir('/flash') # return back to root
