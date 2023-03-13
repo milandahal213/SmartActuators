@@ -1,5 +1,5 @@
 # Be careful
-The steps will remove the contents on your SLOT 0 of your SPIKE Prime. 
+The steps will remove the program in your SLOT 0 of your SPIKE Prime. 
 
 1. Update your SPIKE Prime hub to SPIKE3. (make sure your hub light is green)
 2. Open the SPIKE Prime on REPL mode (follow instructions here - https://www.instructables.com/MicroPython-on-SPIKE-Prime/ )
