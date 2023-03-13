@@ -16,7 +16,7 @@ The steps will remove the program in your SLOT 0 of your SPIKE Prime.
 6. Now your SPIKE Prime is trained
 
 # what is the code doing??
-There are two parts to the code. One is saving the file on your SmartMotors and the other one is the actual SmartMotors code. 
+There are two parts to the code. One is saving the file on your SPIKE Prime and the other one is the actual SmartMotors code. 
 1. Saving the file on SmartMotors:
 * The code changes directory to programs and creates a folder 00 which is your slot. 
 * If your slot already has code in it, it will get deleted. 
