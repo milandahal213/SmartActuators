@@ -23,9 +23,9 @@ There are two parts to the code. One is saving the file on your SPIKE Prime and 
 * Then it proceeds to write the SmartMotors code to a file named program.py that will get executed on slot 0. 
 
 2. SmartMotors code
-* First the code is waiting for you to save a configuration of sensor and robot pairs. 
-* You will be able to see different sensor and motor pairings. if you plug in and out the sensors the connections will change based on what is allowed. You can either have one sensor control multiple motors or one sensor control one motor (three pairs) 
+* First the code lets save a configuration of sensor and robot pairs. 
+* if you plug in and out the sensors and motors the LEDs will show what sensor will talk to what motor. You can either have one sensor control multiple motors or one sensor control one motor (three pairs) 
 * Then the program allows you to save data for each SmartMotors pair
-* When you finally train all the SmartMotors pair, the motors will move according to the training. 
+* When you finally train all the SmartMotors pairs, the motors will move according to the training. 
 
 Please send any feedback to milan.dahal@tufts.edu
