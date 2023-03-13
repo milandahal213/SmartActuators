@@ -18,8 +18,8 @@ The steps will remove the program in your SLOT 0 of your SPIKE Prime.
 # what is the code doing??
 There are two parts to the code. One is saving the file on your SPIKE Prime and the other one is the actual SmartMotors code. 
 1. Saving the file on SmartMotors:
-* The code changes directory to /programs and creates a folder 00 which is your slot. 
-* If your slot already has code in it, it will get deleted. 
+* The code changes directory to /programs and creates a folder 00
+* If your slot 0 already has code in it, it will get deleted. 
 * Then it proceeds to write the SmartMotors code to a file named program.py that will get executed on slot 0. 
 
 2. SmartMotors code
