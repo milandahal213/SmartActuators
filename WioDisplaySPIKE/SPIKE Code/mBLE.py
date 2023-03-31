@@ -151,6 +151,7 @@ def decode_services(payload):
     return services
 
 
+
 class BLESimplePeripheral:
     def __init__(self, name="robot", logo="00000:05550:05950:05550:00000", ble=None):
         self._n=12
