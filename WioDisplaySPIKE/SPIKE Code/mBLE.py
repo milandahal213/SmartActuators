@@ -7,7 +7,7 @@ import time
 from time import sleep_ms
 from micropython import const
 from machine import Timer
-
+import hub
 
 import json
 
