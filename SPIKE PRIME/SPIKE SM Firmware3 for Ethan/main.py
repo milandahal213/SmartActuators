@@ -1,9 +1,13 @@
-#LastEdit- Feb 21 2023
+import os
+os.chdir("program")
+os.mkdir("00")
+os.chdir("00")
+f=open("program.py","w")
+#LastEdit- Feb 24 2023
 #SmartMotor Code to be used on SPIKE3
 #Motor Port A
 #Sensor Port B
-
-
+a='''
 import hub
 import motor
 import port
@@ -11,7 +15,6 @@ import time
 import rgb
 import button
 import display
-
 from machine import Timer
 import sound
 sensorPort=port.PORTB
@@ -81,7 +84,7 @@ def displayScreen(sensorValue, motorValue,brightness=100):
  oldx=x
  oldy=y
 
-SmartMotorTone=[[659,140],[659,280],[659,280],[523,140],[659,280],[784,280]]
+ 
 saveTone=[[493,100],[220,100]]
 runTone=[[293,100],[440,100],[587,100],[740,100]]
 trainTone=[[740,100],[587,100],[440,100],[293,100]]
@@ -90,8 +93,8 @@ def playmusic(music):
   sound.beepPlay(note)
   time.sleep_ms(dur)
   sound.soundStop()
-display.display_text_for_time("SM",2000,2000)
-playmusic(SmartMotorTone) 
+
+playmusic(trainTone) 
 
 while not inputbutton(quitProgram)>1000: # it will quit if the centre button is pressed for more than a sec
  sensorValue=getsensorValue(sensorPort)
@@ -123,7 +126,6 @@ while not inputbutton(quitProgram)>1000: # it will quit if the centre button is 
  elif(inputbutton(runMode)):
   rgb.rgb_setColor(0,6) # GREEN color for running
   playmusic(runTone) 
-
   print('running')
   print(data)
   while(inputbutton(runMode)):
@@ -145,4 +147,6 @@ while not inputbutton(quitProgram)>1000: # it will quit if the centre button is 
    blinkx=sensorValue
    blinky=pos
    time.sleep(.1)
-   
+ '''  
+f.write(a)
+f.close()
