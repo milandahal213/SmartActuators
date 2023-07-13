@@ -17,6 +17,7 @@ for program in program_names:
     if (program in os.listdir()):
         os.remove(program) # if found, remove
 
+
 f=open("program.py","w")
 a='''
 #SmartMotors code 
@@ -225,7 +226,7 @@ class SmartMotors:
         pos = a
 
     for index, motorPort in enumerate(self.motors):   
-      motor.motor_move_to_position(motorPort,pos[index],9000)
+      motor.motor_move_to_position(motorPort,pos[index],1000)
 
 
   def showData(self):
@@ -284,6 +285,12 @@ while(not buttonPressed(Run)):
 
 
 '''
+
+
 f.write(a)
+print("Done writing")
 f.close()
+print("File closed")
 os.chdir('/flash') # return back to root
+print('done')
+
