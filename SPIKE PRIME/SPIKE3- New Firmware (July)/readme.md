@@ -2,7 +2,7 @@
 - Go to https://spike.legoeducation.com
 - Connect your SPIKE Prime and update to the latest SPIKE3 firmware version.
 - Start a new Python project on the app.
-- Copy and paste the contents of the smartmotor.py file onto the project
+- Copy and paste the contents of the sm.py file onto the project
 - Save it to your favorite slot (I like to put it on 0 for consistency)
 
 # How to use it:
