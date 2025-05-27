@@ -11,6 +11,7 @@ input()
 print(s.value())
 
 import time
+
 buzzer = Pin(21, Pin.OUT)
 buzzer.on()
 time.sleep(0.2)
