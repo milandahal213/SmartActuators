@@ -10,12 +10,12 @@ name = "Billowing Tooth"
 # Fetch arbitrary content from URLs onto the virtual filesystem, just map a valid
 # URL to a destination in the filesystem path
 [files]
-"https://chrisrogers.pyscriptapps.com/talking-on-a-channel/latest/py/channel.py" = ""
-"https://chrisrogers.pyscriptapps.com/talking-to-a-hub/latest/py/Hub.py" = ''
-"https://chrisrogers.pyscriptapps.com/talking-to-a-hub/latest/py/pyConst.py" = ''
-"https://chrisrogers.pyscriptapps.com/talking-to-a-hub/latest/py/SpikePrime.py" = ''
-"https://chrisrogers.pyscriptapps.com/talking-to-a-hub/latest/py/TechElement.py" = ''
-"https://chrisrogers.pyscriptapps.com/talking-to-a-hub/latest/py/TechElement_EP2.py" = ''
+"https://chrisrogers.pyscriptapps.com/talking-on-a-channel/latest/py/channel.py" = "channel"
+"https://chrisrogers.pyscriptapps.com/talking-to-a-hub/latest/py/Hub.py" = 'Hub'
+"https://chrisrogers.pyscriptapps.com/talking-to-a-hub/latest/py/pyConst.py" = 'pyConst'
+"https://chrisrogers.pyscriptapps.com/talking-to-a-hub/latest/py/SpikePrime.py" = 'SpikePrime'
+"https://chrisrogers.pyscriptapps.com/talking-to-a-hub/latest/py/TechElement.py" = 'TechElement'
+"https://chrisrogers.pyscriptapps.com/talking-to-a-hub/latest/py/TechElement_EP2.py" = 'TechElement_EP2'
 
 # Import JavaScript modules in your project (load them in the main thread of the browser)
 [js_modules.main]
@@ -45,3 +45,4 @@ name = "Billowing Tooth"
 ## Please use the official documentation for further explanation and examples
 # of how to use these features if they are unfamiliar to you.
 # https://docs.pyscript.net/2025.7.3/user-guide/configuration
+
