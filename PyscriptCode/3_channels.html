@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>REPL</title>
+
+    <!-- Recommended meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <!-- Safari SharedArrayBuffer -->
+    <script src="./safari-sab.js"></script>
+
+    <!-- PyScript -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2025.10.3/core.css">
+    <script type="module" src="https://pyscript.net/releases/2025.10.3/core.js"></script>
+    
+</head>
+<body>
+    <h1 style="text-align: center;">Rogers Python Intro</h1>
+    <div id="breadcrumb-container"></div>
+    
+    <script>
+        fetch('crumbs.html')
+            .then(response => response.text())
+            .then(html => {document.getElementById('breadcrumb-container').innerHTML = html;});
+    </script>
+
+    <div id="container" style="display: flex; height: 100vh; gap: 0;">
+        <div id="left" style="flex: 1; overflow: auto;">
+            some help here
+        </div>
+        <div id="divider" style="width: 5px; background-color: #ccc; cursor: col-resize;"></div>
+        <div id="right" style="flex: 1; overflow: auto; padding: 20px;">
+            <div id='all_things_channels'></div>
+            <script id="python-terminal" type="mpy" src="./3_channels.py" config="./pyscript.toml" terminal worker></script>
+        </div>
+    </div>
+
+    
+</body>
+</html>

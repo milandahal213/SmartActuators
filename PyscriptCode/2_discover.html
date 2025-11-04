@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>REPL</title>
+
+    <!-- Recommended meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <!-- Safari SharedArrayBuffer -->
+    <script src="./safari-sab.js"></script>
+
+    <!-- PyScript -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2025.10.3/core.css">
+    <script type="module" src="https://pyscript.net/releases/2025.10.3/core.js"></script>
+
+    <!-- my CSS -->
+    <link rel="stylesheet" href="instr_styles.css">
+    
+</head>
+<body>
+    <h1 style="text-align: center;">Discovery in the REPL</h1>
+    <div id="breadcrumb-container"></div>
+    
+    <script>
+        fetch('crumbs.html')
+            .then(response => response.text())
+            .then(html => {document.getElementById('breadcrumb-container').innerHTML = html;});
+    </script>
+
+    <div id="container" style="display: flex; height: 100vh; gap: 0;">
+        <div id="left" style="flex: 1; overflow: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Goal</th>
+                    <th>Try This</th>
+                    <th>What to Observe</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="task-num">1</td>
+                    <td>Import a library</td>
+                    <td><span class="command">import time</span></td>
+                    <td>Loads a number of methods for timing</td>
+                </tr>
+                <tr>
+                    <td class="task-num">2</td>
+                    <td>Basic autocomplete</td>
+                    <td>Use the TAB button to finish what you type
+                        <span class="command">time.</span> and then press tab</td>
+                    <td>See all the possible methods?</td>
+                </tr>
+                <tr>
+                    <td class="task-num">3</td>
+                    <td>Getting help</td>
+                    <td>try <span class="command">help(time.time)</span> </td>
+                    <td>What result do you get?</td>
+                </tr>
+             </tbody>
+        </table>
+    </div>
+        <div id="divider" style="width: 5px; background-color: #ccc; cursor: col-resize;"></div>
+        <div id="right" style="flex: 1; overflow: auto; padding: 20px;">
+            <script id="python-terminal" type="mpy" src="./2_discover.py" config="./pyscript.toml" terminal worker></script>
+        </div>
+    </div>
+    
+</body>
+</html>

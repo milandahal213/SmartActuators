@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python REPL Learning Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 3px solid #34495e;
+        }
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        .task-num {
+            color: #3498db;
+            font-weight: 600;
+            width: 10%;
+        }
+        .command {
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            background-color: #f4f4f4;
+            padding: 5px 10px;
+            border-radius: 4px;
+            color: #c7254e;
+        }    
+    </style>
+</head>
+<body>
+    <h2>Interactive Python Learning Guide</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Goal</th>
+                <th>Try This</th>
+                <th>What to Observe</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="task-num">1</td>
+                <td>Learn Python interactively in a REPL</td>
+                <td>Get started with basic commands</td>
+                <td>Execute code and see immediate results</td>
+            </tr>
+            <tr>
+                <td class="task-num">2</td>
+                <td>Basic arithmetic</td>
+                <td><span class="command">2+2</span> then press return</td>
+                <td>What result do you get?</td>
+            </tr>
+            <tr>
+                <td class="task-num">3</td>
+                <td>Variable assignment</td>
+                <td><span class="command">a = 2</span> then <span class="command">a+2</span></td>
+                <td>What result do you get?</td>
+            </tr>
+            <tr>
+                <td class="task-num">4</td>
+                <td>Connect to a channel</td>
+                <td><span class="command">channel.msg</span></td>
+                <td>What message value do you receive?</td>
+            </tr>
+            <tr>
+                <td class="task-num">5</td>
+                <td>Explore the channel API</td>
+                <td><span class="command">help(channel)</span></td>
+                <td>Review available methods and how to use them</td>
+            </tr>
+            <tr>
+                <td class="task-num">6</td>
+                <td>Connecting a motor</td>
+                <td>Turn on and advertise</td>
+                <td>Connect and rename as <span class="command">motor1</span></td>
+            </tr>
+            <tr>
+                <td class="task-num">7</td>
+                <td>Reading position</td>
+                <td><span class="command">motor1.position</span></td>
+                <td>You should see the position of the motor</td>
+            </tr>
+            <tr>
+                <td class="task-num">8</td>
+                <td>Running the motor</td>
+                <td><span class="command">motor1.set_speed(100)
+                    motor1.run()
+                </span></td>
+                <td>You should see the motor spin</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

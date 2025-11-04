@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>REPL</title>
+
+    <!-- Recommended meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <!-- Safari SharedArrayBuffer -->
+    <script src="./safari-sab.js"></script>
+
+    <!-- PyScript -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2025.10.3/core.css">
+    <script type="module" src="https://pyscript.net/releases/2025.10.3/core.js"></script>
+    
+    <!-- CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">   
+
+</head>
+<body>
+    <h1 style="text-align: center;">Rogers Python Intro</h1>
+    <div id="breadcrumb-container"></div>
+    
+    <script>
+        fetch('crumbs.html')
+            .then(response => response.text())
+            .then(html => {document.getElementById('breadcrumb-container').innerHTML = html;});
+    </script>
+
+    <div id="container" style="display: flex; height: 100vh; gap: 0;">
+        <div id="left" style="flex: 1; overflow: auto;">
+            <select onchange="toggleContent(this.value);">
+              <option value="start">Getting Started with Python</option>
+              <option value="channel">Talking on a Channel</option>
+              <option value="element">Talking to an Element</option>
+              <option value="code">Writing Your Own Code</option>
+            </select>
+            <div id="start" style="display: block;">
+                <iframe id="guide-frame" src="gettingStarted.html" width="100%" height = 2000px frameborder="0" scrolling="no" style="border: none;"></iframe>
+            </div>
+            <div id="element" style="display: none;">
+                <iframe id="element-frame" src="element.html" width="100%" height = 2000px frameborder="0" scrolling="no" style="border: none;"></iframe>
+            </div>
+            <div id="channel" style="display: none;">
+                <iframe id="channel-frame" src="channel.html" width="100%" height = 2000px frameborder="0" scrolling="no" style="border: none;"></iframe>
+            </div>
+            <div id="code" class="editor-container" style="display: none;">
+                <h2>Writing your own code</h2>
+                <textarea id="code-editor" ></textarea>
+                <button id="REPLRun">Run in REPL</button>
+
+            </div>
+        </div>
+        <div id="divider" style="width: 5px; background-color: #ccc; cursor: col-resize;"></div>
+        <div id="right" style="flex: 1; overflow: auto; padding: 20px;">
+            <div id='all_things_channels'></div>
+            <script id="python-terminal" type="mpy" src="./main.py" config="./pyscript.toml" env = 'image' terminal worker></script>
+            <div id='hub1'></div>
+            <div id='hub2'></div>
+        </div>
+    </div>
+    <script type="mpy-editor"  env = 'image' >import os</script>
+
+<!-- CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="scripts.js"></script>
+    
+</body>
+</html>
