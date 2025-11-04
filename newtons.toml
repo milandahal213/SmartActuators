@@ -20,7 +20,7 @@ name = "Billowing Tooth"
 # Import JavaScript modules in your project (load them in the main thread of the browser)
 [js_modules.main]
 "https://chrisrogers.pyscriptapps.com/talking-to-a-hub/latest/js/ble2.js" = "ble"
-"code.js" = "code_editor"
+"https://github.com/milandahal213/SmartActuators/blob/master/code.js" = "code_editor"
 #
 # You can also import them in the worker thread of the browser
 # [js_modules.worker]
