@@ -21,12 +21,10 @@
 <body>
     <h1 style="text-align: center;">Rogers Python Intro</h1>
     <div id="breadcrumb-container"></div>
-    
-    <script>
-        fetch('crumbs.html')
-            .then(response => response.text())
-            .then(html => {document.getElementById('breadcrumb-container').innerHTML = html;});
-    </script>
+
+    <div id="headertext" style="display: flex;  margin: 20px;">
+The goal of this page is to learn how to talk to the Tech Elements.
+    </div>
 
     <div id="container" style="display: flex; height: 100vh; gap: 0;">
         <div id="left" style="flex: 1; overflow: auto;">
@@ -39,7 +37,7 @@
         <div id="divider" style="width: 5px; background-color: #ccc; cursor: col-resize;"></div>
         <div id="right" style="flex: 1; overflow: auto; padding: 20px;">
             <div id='all_things_channels'></div>
-            <script id="python-terminal" type="mpy" src="./main_copy.py" config="./pyscript.toml" env = 'image' terminal worker></script>
+            <script id="python-terminal" type="mpy" src="./4_techElements.py" config="./pyscript.toml" env = 'image' terminal worker></script>
             <div id='hub1'></div>
             <div id='hub2'></div>
         </div>
@@ -48,7 +46,8 @@
 <!-- CodeMirror JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
-    <script src="scripts.js"></script>
     
+    <script src="scripts.js"></script>    
+     
 </body>
 </html>

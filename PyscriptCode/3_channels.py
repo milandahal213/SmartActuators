@@ -1,5 +1,11 @@
 from pyscript import document, window, when
 
+def unstuck(condition):
+    if condition and hasattr(window, "unstuck") and window.unstuck == True:
+        window.unstuck = False
+        raise Exception("program now unstuck")
+
+    return condition
 import channel as _ch
 import asyncio
 
@@ -7,6 +13,8 @@ mytopic = '/LEGO'
 myChannel = _ch.CEEO_Channel("hackathon", "@chrisrogers", "talking-on-a-channel",
                                  divName = 'all_things_channels', suffix='_test', default_topic = mytopic)
 document.getElementById('topic_test').innerHTML = mytopic
+
+
 
 class Channel:
     """You can use this function to read or write to the channel.
@@ -28,7 +36,7 @@ class Channel:
                 self.value = int(number) if number % 1.0 == 0 else number
             except:
                 self.value = -1
-            
+
     async def _sendIt(self, msg):
         thetopic = document.getElementById('topic_test').value
         return await myChannel.post(thetopic, msg)
@@ -41,3 +49,5 @@ channel = Channel()
 
 import code
 code.interact()
+
+

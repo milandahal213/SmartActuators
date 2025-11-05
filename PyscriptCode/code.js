@@ -1,4 +1,5 @@
-export const editor = CodeMirror.fromTextArea(
+// code.js
+export const editor = window.CodeMirror.fromTextArea(
     document.getElementById('code-editor'),
     {
         lineNumbers: true,

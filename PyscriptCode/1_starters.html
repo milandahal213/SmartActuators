@@ -20,13 +20,12 @@
 <body>
     <h1 style="text-align: center;">Python Starters</h1>
     <div id="breadcrumb-container"></div>
-    
-    <script>
-        fetch('crumbs.html')
-            .then(response => response.text())
-            .then(html => {document.getElementById('breadcrumb-container').innerHTML = html;});
-    </script>
 
+    <div id="headertext" style="display: flex;  margin: 20px;">
+The goal of this page is to start learning how to interact with Python.  Python allows you to try running any line of code
+in the REPL (the black boc to your right).  Here are a few things to try out and see what happens.  Make sure to experiment 
+(try adding different numbers or using different variable names)
+    </div>
     <div id="container" style="display: flex; height: 100vh; gap: 0;">
         <div id="left" style="flex: 1; overflow: auto;">
         <table>
@@ -35,7 +34,7 @@
                     <th>#</th>
                     <th>Goal</th>
                     <th>Try This</th>
-                    <th>What to Observe</th>
+                    <th>What to Observe </th>
                 </tr>
             </thead>
             <tbody>
@@ -54,7 +53,7 @@
                 <tr>
                     <td class="task-num">3</td>
                     <td>Variable assignment</td>
-                    <td><span class="command">a = 2</span> then just type a<span class="command">a</span></td>
+                    <td><span class="command">a = 2</span> then just type an <span class="command">a</span></td>
                     <td>What result do you get? </td>
                 </tr>
                 <tr>
@@ -88,6 +87,7 @@ for i in range(10):
             <script id="python-terminal" type="mpy" src="./1_starters.py" config="./pyscript.toml" terminal worker></script>
         </div>
     </div>
-
+    
+    <script src="scripts.js"></script>    
 </body>
 </html>

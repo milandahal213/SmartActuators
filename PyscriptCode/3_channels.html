@@ -10,32 +10,75 @@
     <!-- Safari SharedArrayBuffer -->
     <script src="./safari-sab.js"></script>
 
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+    
     <!-- PyScript -->
     <link rel="stylesheet" href="https://pyscript.net/releases/2025.10.3/core.css">
     <script type="module" src="https://pyscript.net/releases/2025.10.3/core.js"></script>
-    
+
+
+
+    <!-- my CSS -->
+    <link rel="stylesheet" href="instr_styles.css">
+
 </head>
 <body>
     <h1 style="text-align: center;">Rogers Python Intro</h1>
     <div id="breadcrumb-container"></div>
-    
-    <script>
-        fetch('crumbs.html')
-            .then(response => response.text())
-            .then(html => {document.getElementById('breadcrumb-container').innerHTML = html;});
-    </script>
 
+    <div id="headertext" style="display: flex;  margin: 20px;">
+The goal of this page is to learn how channels work - they are a powerful way for any two webpages to talk to each other.
+We will use channels to help all the inventions work together.
+    </div>
+<button onclick="globalThis.unstuck=true">☠️</button>
     <div id="container" style="display: flex; height: 100vh; gap: 0;">
         <div id="left" style="flex: 1; overflow: auto;">
-            some help here
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Goal</th>
+                    <th>Try This</th>
+                    <th>What to Observe</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="task-num">1</td>
+                    <td>Post something on the channel (after you have connected)</td>
+                    <td>type <span class="command">channel.send('/LEGO','it worked')</span> and hit return</td>
+                    <td>You should see that appear above in blue.  So should anyone connected to the channel</td>
+                </tr>
+                <tr>
+                    <td class="task-num">2</td>
+                    <td>Send only to a friend</td>
+                    <td>Change the topic (/LEGO) to something else - and tell your friend
+                        <span class="command">channel.send('/new','it is a secret')</span> and then press tab</td>
+                    <td>Only those people that have your topic typed in will see your message.</td>
+                </tr>
+                <tr>
+                    <td class="task-num">3</td>
+                    <td>Reading a channel</td>
+                    <td>the variable <span class="command">channel.msg</span> will have the latest channel value</td>
+                    <td>What result do you get?</td>
+                </tr>
+             </tbody>
+        </table>
         </div>
         <div id="divider" style="width: 5px; background-color: #ccc; cursor: col-resize;"></div>
         <div id="right" style="flex: 1; overflow: auto; padding: 20px;">
             <div id='all_things_channels'></div>
-            <script id="python-terminal" type="mpy" src="./3_channels.py" config="./pyscript.toml" terminal worker></script>
+            <script id="python-terminal" type="mpy" src="./3_channels.py" config="./pyscript.toml" terminal></script>
+            <div id='hub1'></div>
+            <div id='hub2'></div>
+       
         </div>
     </div>
-
-    
+    <script src="scripts.js"></script>
+    <textarea id="code-editor"></textarea>
 </body>
 </html>

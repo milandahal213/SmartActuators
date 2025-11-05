@@ -7,15 +7,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-    <!-- Safari SharedArrayBuffer -->
-    <script src="./safari-sab.js"></script>
-
     <!-- PyScript -->
     <link rel="stylesheet" href="https://pyscript.net/releases/2025.10.3/core.css">
     <script type="module" src="https://pyscript.net/releases/2025.10.3/core.js"></script>
-    
-    <!-- CodeMirror CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">     <script>/*! coi-serviceworker v0.1.7 - Guido Zuidhof and contributors, licensed under MIT */
+
+    <script>/*! coi-serviceworker v0.1.7 - Guido Zuidhof and contributors, licensed under MIT */
         /*! mini-coi - Andrea Giammarchi and contributors, licensed under MIT */
         (({ document: d, navigator: { serviceWorker: s } }) => {
           if (d) {
@@ -47,15 +43,10 @@
 
 </head>
 <body>
-    <h1 style="text-align: center;">Rogers Python Intro</h1>
-    <div id="breadcrumb-container"></div>
-    
-    <script>
-        fetch('crumbs.html')
-            .then(response => response.text())
-            .then(html => {document.getElementById('breadcrumb-container').innerHTML = html;});
+    <h1 style="text-align: center;">The REPL</h1>
+    <script id="python-terminal" type="mpy" terminal worker>
+        import code
+        code.interact()
     </script>
-
-    Someday there will be something interesting here - in the meantime click on the links above
 </body>
 </html>
